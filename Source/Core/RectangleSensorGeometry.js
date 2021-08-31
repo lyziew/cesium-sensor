@@ -45,9 +45,10 @@ function RectangleSensorGeometry(options) {
   options = defaultValue(options, defaultValue.EMPTY_OBJECT);
   var vertexFormat = defaultValue(options.vertexFormat, VertexFormat.DEFAULT);
   var length = options.length;
-  var xHalfAngle = defaultValue(options.topInnerRadius, CesiumMath.PI_OVER_SIX);
-  var yHalfAngle = defaultValue(options.topOuterRadius, CesiumMath.PI_OVER_SIX);
-
+  var leftHalfAngle = defaultValue(options.topInnerRadius, CesiumMath.PI_OVER_SIX);
+  var rightHalfAngle = defaultValue(options.topOuterRadius, CesiumMath.PI_OVER_SIX);
+  var frontHalfAngle = defaultValue(options.topInnerRadius, CesiumMath.PI_OVER_SIX);
+  var backHalfAngle = defaultValue(options.topOuterRadius, CesiumMath.PI_OVER_SIX);
   //>>includeStart('debug', pragmas.debug);
   if (!defined(length)) {
     throw new DeveloperError("options.length must be defined.");
@@ -64,8 +65,10 @@ function RectangleSensorGeometry(options) {
   //>>includeEnd('debug');
 
   this._length = length;
-  this._xHalfAngle = xHalfAngle;
-  this._yHalfAngle = yHalfAngle;
+  this._leftHalfAngle = leftHalfAngle;
+  this._rightHalfAngle = rightHalfAngle;
+  this._frontHalfAngle = frontHalfAngle;
+  this._backHalfAngle = backHalfAngle;
   this._vertexFormat = VertexFormat.clone(vertexFormat);
   this._offsetAttribute = options.offsetAttribute;
   this._workerName = "createRectangleSensorGeometry";
@@ -75,7 +78,7 @@ function RectangleSensorGeometry(options) {
  * The number of elements used to pack the object into an array.
  * @type {Number}
  */
-RectangleSensorGeometry.packedLength = VertexFormat.packedLength + 10;
+RectangleSensorGeometry.packedLength = VertexFormat.packedLength + 6;
 
 /**
  * Stores the provided instance into the provided array.
@@ -102,14 +105,10 @@ RectangleSensorGeometry.pack = function (value, array, startingIndex) {
   startingIndex += VertexFormat.packedLength;
 
   array[startingIndex++] = value._length;
-  array[startingIndex++] = value._topInnerRadius;
-  array[startingIndex++] = value._topOuterRadius;
-  array[startingIndex++] = value._bottomInnerRadius;
-  array[startingIndex++] = value._bottomOuterRadius;
-  array[startingIndex++] = value._thetaSegments;
-  array[startingIndex++] = value._phiSegments;
-  array[startingIndex++] = value._thetaStart;
-  array[startingIndex++] = value._thetaLength;
+  array[startingIndex++] = value._leftHalfAngle;
+  array[startingIndex++] = value._rightHalfAngle;
+  array[startingIndex++] = value._frontHalfAngle;
+  array[startingIndex++] = value._backHalfAngle;
   array[startingIndex] = defaultValue(value._offsetAttribute, -1);
 
   return array;
@@ -119,14 +118,10 @@ var scratchVertexFormat = new VertexFormat();
 var scratchOptions = {
   vertexFormat: scratchVertexFormat,
   length: undefined,
-  topInnerRadius : undefined,
-  topOuterRadius : undefined,
-  bottomInnerRadius : undefined,
-  bottomOuterRadius : undefined,
-  thetaSegments : undefined,
-  phiSegments : undefined,
-  thetaStart : undefined,
-  thetaLength : undefined,
+  leftHalfAngle : undefined,
+  rightHalfAngle : undefined,
+  frontHalfAngle : undefined,
+  backHalfAngle : undefined,
   offsetAttribute : undefined,
 };
 
@@ -155,26 +150,18 @@ RectangleSensorGeometry.unpack = function (array, startingIndex, result) {
   startingIndex += VertexFormat.packedLength;
 
   var length = array[startingIndex++];
-  var topInnerRadius = array[startingIndex++];
-  var topOuterRadius = array[startingIndex++];
-  var bottomInnerRadius = array[startingIndex++];
-  var bottomOuterRadius = array[startingIndex++];
-  var thetaSegments = array[startingIndex++];
-  var phiSegments = array[startingIndex++];
-  var thetaStart = array[startingIndex++];
-  var thetaLength = array[startingIndex++];
+  var leftHalfAngle = array[startingIndex++];
+  var rightHalfAngle = array[startingIndex++];
+  var frontHalfAngle = array[startingIndex++];
+  var backHalfAngle = array[startingIndex++];
   var offsetAttribute = array[startingIndex];
 
   if (!defined(result)) {
     scratchOptions.length = length;
-    scratchOptions.topInnerRadius = topInnerRadius;
-    scratchOptions.topOuterRadius = topOuterRadius;
-    scratchOptions.bottomInnerRadius = bottomInnerRadius;
-    scratchOptions.bottomOuterRadius = bottomOuterRadius;
-    scratchOptions.thetaSegments = thetaSegments;
-    scratchOptions.phiSegments = phiSegments;
-    scratchOptions.thetaStart = thetaStart;
-    scratchOptions.thetaLength = thetaLength;
+    scratchOptions.leftHalfAngle = leftHalfAngle;
+    scratchOptions.rightHalfAngle = rightHalfAngle;
+    scratchOptions.frontHalfAngle = frontHalfAngle;
+    scratchOptions.backHalfAngle = backHalfAngle;
     scratchOptions.offsetAttribute =
       offsetAttribute === -1 ? undefined : offsetAttribute;
     return new RectangleSensorGeometry(scratchOptions);
@@ -182,14 +169,10 @@ RectangleSensorGeometry.unpack = function (array, startingIndex, result) {
 
   result._vertexFormat = VertexFormat.clone(vertexFormat, result._vertexFormat);
   result._length = length;
-  result._topInnerRadius = topInnerRadius;
-  result._topOuterRadius = topOuterRadius;
-  result._bottomInnerRadius = bottomInnerRadius;
-  result._bottomOuterRadius = bottomOuterRadius;
-  result._thetaSegments = thetaSegments;
-  result._phiSegments = phiSegments;
-  result._thetaStart = thetaStart;
-  result._thetaLength = thetaLength;
+  result._leftHalfAngle = leftHalfAngle;
+  result._rightHalfAngle = rightHalfAngle;
+  result._frontHalfAngle = frontHalfAngle;
+  result._backHalfAngle = backHalfAngle;
   result._offsetAttribute =
     offsetAttribute === -1 ? undefined : offsetAttribute;
 
@@ -205,26 +188,17 @@ RectangleSensorGeometry.unpack = function (array, startingIndex, result) {
 RectangleSensorGeometry.createGeometry = function (rectangleSensorGeometry) {
   var vertexFormat = rectangleSensorGeometry._vertexFormat;
   var length = rectangleSensorGeometry._length;
-  var topInnerRadius = rectangleSensorGeometry._topInnerRadius;
-  var topOuterRadius = rectangleSensorGeometry._topOuterRadius;
-  var bottomInnerRadius = rectangleSensorGeometry._bottomInnerRadius;
-  var bottomOuterRadius = rectangleSensorGeometry._bottomOuterRadius;
-  var thetaSegments = rectangleSensorGeometry._thetaSegments;
-  var phiSegments = rectangleSensorGeometry._phiSegments;
-  var thetaStart = rectangleSensorGeometry._thetaStart;
-  var thetaLength = rectangleSensorGeometry._thetaLength;
-
-  thetaStart = thetaStart !== undefined ? thetaStart : 0;
-  thetaLength = thetaLength !== undefined ? thetaLength : CesiumMath.TWO_PI;
-  thetaSegments = thetaSegments !== undefined ? Math.max(3, thetaSegments) : 8;
-  phiSegments = phiSegments !== undefined ? Math.max(1, phiSegments) : 1;
+  var leftHalfAngle = rectangleSensorGeometry._leftHalfAngle;
+  var rightHalfAngle = rectangleSensorGeometry._rightHalfAngle;
+  var frontHalfAngle = rectangleSensorGeometry._frontHalfAngle;
+  var backHalfAngle = rectangleSensorGeometry._backHalfAngle;
 
   if (
     length <= 0 ||
-    topInnerRadius < 0 ||
-    topOuterRadius < 0 ||
-    bottomInnerRadius < 0 ||
-    (bottomOuterRadius === 0)
+    leftHalfAngle <= 0 ||
+    rightHalfAngle <= 0 ||
+    frontHalfAngle <= 0 ||
+    (backHalfAngle <= 0)
   ) {
     return;
   }
@@ -237,23 +211,42 @@ RectangleSensorGeometry.createGeometry = function (rectangleSensorGeometry) {
   var stIndex = 0;
   var index = 0;
   // 上下顶 + 外面 + 内面
-  var vertexCount = (phiSegments + 1) * (thetaSegments + 1) * 2 + (thetaSegments + 1) * 4;
+  var vertexCount = 10;
   // 上下面 + 内外面 + 2个截面
-  var numIndices = phiSegments * thetaSegments * 2 * 2 * 3 + (thetaSegments) * 2 * 2 * 3 + 4 * 3;
+  var numIndices = 6;
   var indices  = IndexDatatype.createTypedArray(vertexCount, numIndices);
-  var positions = new Float64Array(vertexCount * 3 * 2 + 1);
+  var positions = new Float64Array(vertexCount * 3);
   var normals = vertexFormat.normal
-                ? new Float32Array(vertexCount * 3 * 2 + 1)
+                ? new Float32Array(vertexCount * 3)
                 : undefined;
   var tangents = vertexFormat.tangent
-                 ? new Float32Array(vertexCount * 3 * 2 + 1)
+                 ? new Float32Array(vertexCount * 3)
                  : undefined;
   var bitangents = vertexFormat.bitangent
-                   ? new Float32Array(vertexCount * 3 * 2 + 1)
+                   ? new Float32Array(vertexCount * 3)
                    : undefined;
-  var st = vertexFormat.st ? new Float32Array(vertexCount * 2 * 2 + 1) : undefined;
-  // 顶面
+  var st = vertexFormat.st ? new Float32Array(vertexCount * 2) : undefined;
 
+  // 顶点
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = -length/2;
+  // 前点
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = length * Math.sin(frontHalfAngle);
+  positions[positionIndex++] = -3 * length/2;
+  // 后点
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = -length * Math.sin(backHalfAngle);
+  positions[positionIndex++] = -3 * length/2;
+  // 左点
+  positions[positionIndex++] = -length * Math.sin(leftHalfAngle);
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = -3 * length/2;
+  // 右点
+  positions[positionIndex++] = length * Math.sin(rightHalfAngle);
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = -3 * length/2;
   // some helper variables
   let radius = topInnerRadius;
   let radiusStep = ((topOuterRadius - topInnerRadius) / phiSegments);

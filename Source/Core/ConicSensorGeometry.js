@@ -265,7 +265,7 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
   // 上下顶 + 外面 + 内面
   let vertexCount = (phiSegments + 1) * (thetaSegments + 1) * 2 + (thetaSegments + 1) * 4;
   // 上下面 + 内外面
-  let numIndices = phiSegments * thetaSegments * 2 * 2 * 3 + thetaSegments * 2 * 2
+  let numIndices = phiSegments * thetaSegments * 2 * 2 * 3 + thetaSegments * 2 * 2 * 3;
   if(thetaLength !== CesiumMath.TWO_PI) {
     //2个截面
     numIndices+=+ 4 * 3;
@@ -646,6 +646,9 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
     indices[index++] = oet;
     indices[index++] = oed;
   }
+
+  console.log(index);
+  console.log(numIndices);
 
   let attributes = new GeometryAttributes();
   if (vertexFormat.position) {

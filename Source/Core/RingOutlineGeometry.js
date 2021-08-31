@@ -175,13 +175,12 @@ RingOutlineGeometry.createGeometry = function(ringGeometry) {
   thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
   thetaSegments = thetaSegments !== undefined ? Math.max(3, thetaSegments) : 8;
   phiSegments = phiSegments !== undefined ? Math.max(1, phiSegments) : 1;
-  console.log(thetaSegments);
-  console.log(phiSegments);
+
   // buffers
   var positionIndex = 0;
   var index = 0;
   var vertexCount = (phiSegments + 1) * (thetaSegments + 1);
-  var numIndices = phiSegments * thetaSegments * 6;
+  var numIndices = ((phiSegments + 1) * thetaSegments + phiSegments * (thetaSegments + 1) ) * 2;
   var indices = IndexDatatype.createTypedArray(vertexCount, numIndices);
   var positions = new Float64Array(vertexCount * 3);
 
@@ -215,33 +214,31 @@ RingOutlineGeometry.createGeometry = function(ringGeometry) {
   // indices
 
   for (j = 0; j < phiSegments; j++) {
-
     var thetaSegmentLevel = j * (thetaSegments + 1);
-
-    for (i = 0; i < thetaSegments; i++) {
-
+    for (i = 0; i < thetaSegments + 1; i++) {
       segment = i + thetaSegmentLevel;
-
       var a = segment;
       var b = segment + thetaSegments + 1;
-      var c = segment + thetaSegments + 2;
-      var d = segment + 1;
-
       // lins
       indices[index++] = a;
       indices[index++] = b;
-      // indices[index++] = d;
-      // indices[index++] = b;
-      indices[index++] = d;
-      indices[index++] = a;
-
-      // indices[index++] = c;
-      // indices[index++] = d;
-      indices[index++] = c;
-      indices[index++] = b;
-
     }
   }
+
+  for (j = 0; j < phiSegments + 1; j++) {
+    var thetaSegmentLevel = j * (thetaSegments + 1);
+    for (i = 0; i < thetaSegments; i++) {
+      segment = i + thetaSegmentLevel;
+      var a = segment;
+      var b = segment + 1;
+      // lins
+      indices[index++] = a;
+      indices[index++] = b;
+    }
+  }
+
+  console.log(index)
+  console.log(numIndices);
 
   var attributes = new GeometryAttributes();
   attributes.position = new GeometryAttribute({

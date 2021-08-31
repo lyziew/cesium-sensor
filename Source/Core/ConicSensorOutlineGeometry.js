@@ -2,9 +2,7 @@ import arrayFill from "./arrayFill.js";
 import BoundingSphere from "./BoundingSphere.js";
 import Cartesian2 from "./Cartesian2.js";
 import Cartesian3 from "./Cartesian3.js";
-import Check from "./Check.js";
 import ComponentDatatype from "./ComponentDatatype.js";
-import CylinderGeometryLibrary from "./CylinderGeometryLibrary.js";
 import defaultValue from "./defaultValue.js";
 import defined from "./defined.js";
 import DeveloperError from "./DeveloperError.js";
@@ -15,9 +13,6 @@ import GeometryOffsetAttribute from "./GeometryOffsetAttribute.js";
 import IndexDatatype from "./IndexDatatype.js";
 import PrimitiveType from "./PrimitiveType.js";
 import CesiumMath from "./Math";
-import VertexFormat from "./VertexFormat";
-
-let radiusScratch = new Cartesian2();
 
 /**
  * A description of the outline of a conicSensor.
@@ -245,11 +240,147 @@ ConicSensorOutlineGeometry.createGeometry = function (conicSensorGeometry) {
   // buffers
   let index = 0;
   let positionIndex = 0;
+  // 上下顶 + 外面 + 内面
   let vertexCount = (phiSegments + 1) * (thetaSegments + 1) * 2 + (thetaSegments + 1) * 4;
   // 上下面 + 内外面
-  let numIndices = (phiSegments + 1) * thetaSegments * 2 * 3 + (thetaSegments) * 2 * 2 * 3
+  let numIndices = ((phiSegments + 1) * thetaSegments + phiSegments * (thetaSegments + 1) ) * 4 + (thetaSegments + 1) * 4
 
-  let indices = IndexDatatype.createTypedArray(1, 2);
+  let indices = IndexDatatype.createTypedArray(vertexCount, numIndices);
+  let positions = new Float64Array(vertexCount * 3);
+  // 顶面
+  // some helper variables
+  let radius = topInnerRadius;
+  let radiusStep = ((topOuterRadius - topInnerRadius) / phiSegments);
+  // generate vertices, normals and uvs
+  for (let j = 0; j <= phiSegments; j++) {
+    for (let i = 0; i <= thetaSegments; i++) {
+      // values are generate from the inside of the ring to the outside
+      let segment = thetaStart + i / thetaSegments * thetaLength;
+      // vertex
+      let x = radius * Math.cos(segment);
+      let y = radius * Math.sin(segment);
+      positions[positionIndex++] = x;
+      positions[positionIndex++] = y;
+      positions[positionIndex++] = -length / 2 ;
+    }
+    // increase the radius for next row of vertices
+    radius += radiusStep;
+  }
+
+  let topStart = 0;
+  for (let j = 0; j < phiSegments; j++) {
+    let thetaSegmentLevel = j * (thetaSegments + 1);
+    for (let i = 0; i <= thetaSegments; i++) {
+      let segment = i + thetaSegmentLevel;
+      let a = topStart + segment;
+      let b = topStart + segment + thetaSegments + 1;
+      // line
+      indices[index++] = a;
+      indices[index++] = b;
+    }
+  }
+
+  for (let j = 0; j <= phiSegments; j++) {
+    let thetaSegmentLevel = j * (thetaSegments + 1);
+    for (let i = 0; i < thetaSegments; i++) {
+      let segment = i + thetaSegmentLevel;
+      let a = topStart + segment;
+      let b = topStart + segment + 1;
+      // line
+      indices[index++] = a;
+      indices[index++] = b;
+    }
+  }
+  // 底面
+  radius = bottomOuterRadius;
+  radiusStep = ((bottomInnerRadius - bottomOuterRadius) / phiSegments);
+  for (let j = 0; j <= phiSegments; j++) {
+    for (let i = 0; i <= thetaSegments; i++) {
+      // values are generate from the inside of the ring to the outside
+      let segment = thetaStart + i / thetaSegments * thetaLength;
+      // vertex
+      let x = radius * Math.cos(segment);
+      let y = radius * Math.sin(segment);
+      positions[positionIndex++] = x;
+      positions[positionIndex++] = y;
+      positions[positionIndex++] = -length / 2 * 3;
+    }
+    // increase the radius for next row of vertices
+    radius += radiusStep;
+  }
+
+  let bottomStart = (phiSegments + 1) * (thetaSegments + 1);
+  for (let j = 0; j < phiSegments; j++) {
+    let thetaSegmentLevel = j * (thetaSegments + 1);
+    for (let i = 0; i <= thetaSegments; i++) {
+      let segment = i + thetaSegmentLevel;
+      let a = bottomStart + segment;
+      let b = bottomStart + segment + thetaSegments + 1;
+      // line
+      indices[index++] = a;
+      indices[index++] = b;
+    }
+  }
+
+  for (let j = 0; j <= phiSegments; j++) {
+    let thetaSegmentLevel = j * (thetaSegments + 1);
+    for (let i = 0; i < thetaSegments; i++) {
+      let segment = i + thetaSegmentLevel;
+      let a = bottomStart + segment;
+      let b = bottomStart + segment + 1;
+      // line
+      indices[index++] = a;
+      indices[index++] = b;
+    }
+  }
+
+  // 内面
+  for(let i = thetaSegments; i >=0; i--) {
+    let segment = thetaStart + i / thetaSegments * thetaLength;
+    let cos = Math.cos(segment);
+    let sin = Math.sin(segment);
+    positions[positionIndex++] = topInnerRadius * cos;
+    positions[positionIndex++] = topInnerRadius * sin;
+    positions[positionIndex++] = -length / 2;
+    positions[positionIndex++] = bottomInnerRadius * cos;
+    positions[positionIndex++] = bottomInnerRadius * sin;
+    positions[positionIndex++] = -length / 2 * 3;
+  }
+
+  let innserStart = (phiSegments + 1) * (thetaSegments + 1) * 2;
+  for (let i = 0; i <= thetaSegments; i++) {
+    let a = innserStart + i * 2;
+    let b = innserStart + i * 2 + 1
+    // faces
+    indices[index++] = a;
+    indices[index++] = b;
+  }
+
+  // 外面
+  for(let i = 0; i<thetaSegments + 1; i++) {
+    let segment = thetaStart + i / thetaSegments * thetaLength;
+    let cos = Math.cos(segment);
+    let sin = Math.sin(segment);
+    positions[positionIndex++] = topOuterRadius * cos;
+    positions[positionIndex++] = topOuterRadius * sin;
+    positions[positionIndex++] = -length / 2;
+
+    positions[positionIndex++] = bottomOuterRadius * cos;
+    positions[positionIndex++] = bottomOuterRadius * sin;
+    positions[positionIndex++] = -length / 2 * 3;
+  }
+
+  let outerStart = (phiSegments + 1) * (thetaSegments + 1) * 2 + (thetaSegments + 1) * 2;
+  for (let i = 0; i <= thetaSegments; i++) {
+    let a = outerStart + i * 2;
+    let b = outerStart + i * 2 + 1;
+    // faces
+    indices[index++] = a;
+    indices[index++] = b;
+  }
+
+  console.log(index);
+  console.log(numIndices);
 
   let attributes = new GeometryAttributes();
   attributes.position = new GeometryAttribute({
@@ -258,11 +389,12 @@ ConicSensorOutlineGeometry.createGeometry = function (conicSensorGeometry) {
     values: positions,
   });
 
-  radiusScratch.x = length * 0.5;
-  radiusScratch.y = Math.max(bottomRadius, topRadius);
+  let radiusScratch = new Cartesian2();
+  radiusScratch.x = length;
+  radiusScratch.y = Math.max(topOuterRadius,bottomOuterRadius);
 
   let boundingSphere = new BoundingSphere(
-    Cartesian3.ZERO,
+    new Cartesian3(0, 0, -length/2),
     Cartesian2.magnitude(radiusScratch)
   );
 

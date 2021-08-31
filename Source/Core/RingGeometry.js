@@ -201,7 +201,7 @@ RingGeometry.createGeometry = function(ringGeometry) {
   var stIndex = 0;
   var index = 0;
   var vertexCount = (phiSegments + 1) * (thetaSegments + 1);
-  var numIndices = phiSegments * thetaSegments * 2 * 3;
+  var numIndices = phiSegments * thetaSegments * 2 * 3 * 2;
   var indices = IndexDatatype.createTypedArray(vertexCount, numIndices);
   var positions = new Float64Array(vertexCount * 3);
   var normals = vertexFormat.normal
@@ -272,7 +272,7 @@ RingGeometry.createGeometry = function(ringGeometry) {
   }
 
   // indices
-
+  // 正面
   for (j = 0; j < phiSegments; j++) {
 
     var thetaSegmentLevel = j * (thetaSegments + 1);
@@ -295,6 +295,33 @@ RingGeometry.createGeometry = function(ringGeometry) {
       indices[index++] = d;
     }
   }
+
+  // 正面
+  for (j = 0; j < phiSegments; j++) {
+
+    var thetaSegmentLevel = j * (thetaSegments + 1);
+
+    for (i = 0; i < thetaSegments; i++) {
+
+      segment = i + thetaSegmentLevel;
+
+      var a = segment;
+      var b = segment + thetaSegments + 1;
+      var c = segment + thetaSegments + 2;
+      var d = segment + 1;
+
+      // faces
+      indices[index++] = d;
+      indices[index++] = b;
+      indices[index++] = a;
+      indices[index++] = d;
+      indices[index++] = c;
+      indices[index++] = b;
+    }
+  }
+
+  console.log(index);
+  console.log(numIndices);
 
   var attributes = new GeometryAttributes();
   if (vertexFormat.position) {
