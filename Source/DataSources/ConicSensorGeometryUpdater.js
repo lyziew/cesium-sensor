@@ -31,10 +31,14 @@ function ConicSensorGeometryOptions(entity) {
   this.id = entity;
   this.vertexFormat = undefined;
   this.length = undefined;
-  this.topRadius = undefined;
-  this.bottomRadius = undefined;
-  this.slices = undefined;
-  this.numberOfVerticalLines = undefined;
+  this.topInnerRadius = undefined;
+  this.topOuterRadius = undefined;
+  this.bottomInnerRadius = undefined;
+  this.bottomOuterRadius = undefined;
+  this.thetaSegments = undefined;
+  this.phiSegments = undefined;
+  this.thetaStart = undefined;
+  this.thetaLength = undefined;
   this.offsetAttribute = undefined;
 }
 
@@ -241,8 +245,7 @@ ConicSensorGeometryUpdater.prototype._isHidden = function (entity, conicSensor) 
   return (
     !defined(entity.position) ||
     !defined(conicSensor.length) ||
-    !defined(conicSensor.topRadius) ||
-    !defined(conicSensor.bottomRadius) ||
+    !defined(conicSensor.bottomOuterRadius) ||
     GeometryUpdater.prototype._isHidden.call(this, entity, conicSensor)
   );
 };
@@ -252,11 +255,14 @@ ConicSensorGeometryUpdater.prototype._isDynamic = function (entity, conicSensor)
     !entity.position.isConstant || //
     !Property.isConstant(entity.orientation) || //
     !conicSensor.length.isConstant || //
-    !conicSensor.topRadius.isConstant || //
-    !conicSensor.bottomRadius.isConstant || //
-    !Property.isConstant(conicSensor.slices) || //
-    !Property.isConstant(conicSensor.outlineWidth) || //
-    !Property.isConstant(conicSensor.numberOfVerticalLines)
+    !Property.isConstant(conicSensor.topInnerRadius) || //
+    !Property.isConstant(conicSensor.topOuterRadius) || //
+    !Property.isConstant(conicSensor.bottomInnerRadius) || //
+    !conicSensor.bottomOuterRadius.isConstant || //
+    !Property.isConstant(conicSensor.thetaSegments) || //
+    !Property.isConstant(conicSensor.phiSegments) || //
+    !Property.isConstant(conicSensor.thetaStart) || //
+    !Property.isConstant(conicSensor.thetaLength)
   );
 };
 
@@ -275,14 +281,30 @@ ConicSensorGeometryUpdater.prototype._setStaticOptions = function (
     ? PerInstanceColorAppearance.VERTEX_FORMAT
     : MaterialAppearance.MaterialSupport.TEXTURED.vertexFormat;
   options.length = conicSensor.length.getValue(Iso8601.MINIMUM_VALUE);
-  options.topRadius = conicSensor.topRadius.getValue(Iso8601.MINIMUM_VALUE);
-  options.bottomRadius = conicSensor.bottomRadius.getValue(Iso8601.MINIMUM_VALUE);
-  options.slices = Property.getValueOrUndefined(
-    conicSensor.slices,
+  options.topInnerRadius = Property.getValueOrUndefined(
+    conicSensor.topInnerRadius,
+    Iso8601.MINIMUM_VALUE);
+  options.topOuterRadius = Property.getValueOrUndefined(
+    conicSensor.topOuterRadius,
+    Iso8601.MINIMUM_VALUE);
+  options.bottomInnerRadius = Property.getValueOrUndefined(
+    conicSensor.bottomInnerRadius,
+    Iso8601.MINIMUM_VALUE);
+  options.bottomOuterRadius = conicSensor.bottomOuterRadius.getValue(Iso8601.MINIMUM_VALUE);
+  options.thetaSegments = Property.getValueOrUndefined(
+    conicSensor.thetaSegments,
     Iso8601.MINIMUM_VALUE
   );
-  options.numberOfVerticalLines = Property.getValueOrUndefined(
-    conicSensor.numberOfVerticalLines,
+  options.phiSegments = Property.getValueOrUndefined(
+    conicSensor.phiSegments,
+    Iso8601.MINIMUM_VALUE
+  );
+  options.thetaStart = Property.getValueOrUndefined(
+    conicSensor.thetaStart,
+    Iso8601.MINIMUM_VALUE
+  );
+  options.thetaLength = Property.getValueOrUndefined(
+    conicSensor.thetaLength,
     Iso8601.MINIMUM_VALUE
   );
   options.offsetAttribute =
@@ -332,8 +354,7 @@ DynamicConicSensorGeometryUpdater.prototype._isHidden = function (
   return (
     !defined(position) ||
     !defined(options.length) ||
-    !defined(options.topRadius) || //
-    !defined(options.bottomRadius) ||
+    !defined(options.bottomOuterRadius) ||
     DynamicGeometryUpdater.prototype._isHidden.call(
       this,
       entity,
@@ -355,14 +376,24 @@ DynamicConicSensorGeometryUpdater.prototype._setOptions = function (
   );
   var options = this._options;
   options.length = Property.getValueOrUndefined(conicSensor.length, time);
-  options.topRadius = Property.getValueOrUndefined(conicSensor.topRadius, time);
-  options.bottomRadius = Property.getValueOrUndefined(
-    conicSensor.bottomRadius,
+  options.topInnerRadius = Property.getValueOrUndefined(conicSensor.topInnerRadius, time);
+  options.topOuterRadius = Property.getValueOrUndefined(conicSensor.topOuterRadius, time);
+  options.bottomInnerRadius = Property.getValueOrUndefined(
+    conicSensor.bottomInnerRadius,
     time
   );
-  options.slices = Property.getValueOrUndefined(conicSensor.slices, time);
-  options.numberOfVerticalLines = Property.getValueOrUndefined(
-    conicSensor.numberOfVerticalLines,
+  options.bottomOuterRadius = Property.getValueOrUndefined(
+    conicSensor.bottomOuterRadius,
+    time
+  );
+  options.thetaSegments = Property.getValueOrUndefined(conicSensor.thetaSegments, time);
+  options.phiSegments = Property.getValueOrUndefined(
+    conicSensor.phiSegments,
+    time
+  );
+  options.thetaStart = Property.getValueOrUndefined(conicSensor.thetaStart, time);
+  options.thetaLength = Property.getValueOrUndefined(
+    conicSensor.thetaLength,
     time
   );
   options.offsetAttribute =

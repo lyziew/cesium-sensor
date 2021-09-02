@@ -2,9 +2,7 @@ import arrayFill from "./arrayFill.js";
 import BoundingSphere from "./BoundingSphere.js";
 import Cartesian2 from "./Cartesian2.js";
 import Cartesian3 from "./Cartesian3.js";
-import Check from "./Check.js";
 import ComponentDatatype from "./ComponentDatatype.js";
-import CylinderGeometryLibrary from "./CylinderGeometryLibrary.js";
 import defaultValue from "./defaultValue.js";
 import defined from "./defined.js";
 import DeveloperError from "./DeveloperError.js";
@@ -13,9 +11,8 @@ import GeometryAttribute from "./GeometryAttribute.js";
 import GeometryAttributes from "./GeometryAttributes.js";
 import GeometryOffsetAttribute from "./GeometryOffsetAttribute.js";
 import IndexDatatype from "./IndexDatatype.js";
+import CesiumMath from "./Math.js";
 import PrimitiveType from "./PrimitiveType.js";
-
-var radiusScratch = new Cartesian2();
 
 /**
  * A description of the outline of a rectangleSensor.
@@ -49,21 +46,16 @@ var radiusScratch = new Cartesian2();
  */
 function RectangleSensorOutlineGeometry(options) {
   options = defaultValue(options, defaultValue.EMPTY_OBJECT);
-
   var length = options.length;
-  var topRadius = options.topRadius;
-  var bottomRadius = options.bottomRadius;
-  var slices = defaultValue(options.slices, 128);
-  var numberOfVerticalLines = Math.max(
-    defaultValue(options.numberOfVerticalLines, 16),
-    0
-  );
-
+  var leftHalfAngle = defaultValue(options.leftHalfAngle, CesiumMath.PI_OVER_SIX);
+  var rightHalfAngle = defaultValue(options.rightHalfAngle, CesiumMath.PI_OVER_SIX);
+  var frontHalfAngle = defaultValue(options.frontHalfAngle, CesiumMath.PI_OVER_SIX);
+  var backHalfAngle = defaultValue(options.backHalfAngle, CesiumMath.PI_OVER_SIX);
   //>>includeStart('debug', pragmas.debug);
-  Check.typeOf.number("options.positions", length);
-  Check.typeOf.number("options.topRadius", topRadius);
-  Check.typeOf.number("options.bottomRadius", bottomRadius);
-  Check.typeOf.number.greaterThanOrEquals("options.slices", slices, 3);
+  if (!defined(length)) {
+    throw new DeveloperError("options.length must be defined.");
+  }
+
   if (
     defined(options.offsetAttribute) &&
     options.offsetAttribute === GeometryOffsetAttribute.TOP
@@ -75,10 +67,10 @@ function RectangleSensorOutlineGeometry(options) {
   //>>includeEnd('debug');
 
   this._length = length;
-  this._topRadius = topRadius;
-  this._bottomRadius = bottomRadius;
-  this._slices = slices;
-  this._numberOfVerticalLines = numberOfVerticalLines;
+  this._leftHalfAngle = leftHalfAngle;
+  this._rightHalfAngle = rightHalfAngle;
+  this._frontHalfAngle = frontHalfAngle;
+  this._backHalfAngle = backHalfAngle;
   this._offsetAttribute = options.offsetAttribute;
   this._workerName = "createRectangleSensorOutlineGeometry";
 }
@@ -100,17 +92,20 @@ RectangleSensorOutlineGeometry.packedLength = 6;
  */
 RectangleSensorOutlineGeometry.pack = function (value, array, startingIndex) {
   //>>includeStart('debug', pragmas.debug);
-  Check.typeOf.object("value", value);
-  Check.defined("array", array);
+  if (!defined(value)) {
+    throw new DeveloperError("value is required");
+  }
+  if (!defined(array)) {
+    throw new DeveloperError("array is required");
+  }
   //>>includeEnd('debug');
 
   startingIndex = defaultValue(startingIndex, 0);
-
   array[startingIndex++] = value._length;
-  array[startingIndex++] = value._topRadius;
-  array[startingIndex++] = value._bottomRadius;
-  array[startingIndex++] = value._slices;
-  array[startingIndex++] = value._numberOfVerticalLines;
+  array[startingIndex++] = value._leftHalfAngle;
+  array[startingIndex++] = value._rightHalfAngle;
+  array[startingIndex++] = value._frontHalfAngle;
+  array[startingIndex++] = value._backHalfAngle;
   array[startingIndex] = defaultValue(value._offsetAttribute, -1);
 
   return array;
@@ -118,13 +113,12 @@ RectangleSensorOutlineGeometry.pack = function (value, array, startingIndex) {
 
 var scratchOptions = {
   length: undefined,
-  topRadius: undefined,
-  bottomRadius: undefined,
-  slices: undefined,
-  numberOfVerticalLines: undefined,
-  offsetAttribute: undefined,
+  leftHalfAngle : undefined,
+  rightHalfAngle : undefined,
+  frontHalfAngle : undefined,
+  backHalfAngle : undefined,
+  offsetAttribute : undefined,
 };
-
 /**
  * Retrieves an instance from a packed array.
  *
@@ -135,100 +129,153 @@ var scratchOptions = {
  */
 RectangleSensorOutlineGeometry.unpack = function (array, startingIndex, result) {
   //>>includeStart('debug', pragmas.debug);
-  Check.defined("array", array);
+  if (!defined(array)) {
+    throw new DeveloperError("array is required");
+  }
   //>>includeEnd('debug');
-
   startingIndex = defaultValue(startingIndex, 0);
-
   var length = array[startingIndex++];
-  var topRadius = array[startingIndex++];
-  var bottomRadius = array[startingIndex++];
-  var slices = array[startingIndex++];
-  var numberOfVerticalLines = array[startingIndex++];
+  var leftHalfAngle = array[startingIndex++];
+  var rightHalfAngle = array[startingIndex++];
+  var frontHalfAngle = array[startingIndex++];
+  var backHalfAngle = array[startingIndex++];
   var offsetAttribute = array[startingIndex];
 
   if (!defined(result)) {
     scratchOptions.length = length;
-    scratchOptions.topRadius = topRadius;
-    scratchOptions.bottomRadius = bottomRadius;
-    scratchOptions.slices = slices;
-    scratchOptions.numberOfVerticalLines = numberOfVerticalLines;
+    scratchOptions.leftHalfAngle = leftHalfAngle;
+    scratchOptions.rightHalfAngle = rightHalfAngle;
+    scratchOptions.frontHalfAngle = frontHalfAngle;
+    scratchOptions.backHalfAngle = backHalfAngle;
     scratchOptions.offsetAttribute =
       offsetAttribute === -1 ? undefined : offsetAttribute;
     return new RectangleSensorOutlineGeometry(scratchOptions);
   }
 
   result._length = length;
-  result._topRadius = topRadius;
-  result._bottomRadius = bottomRadius;
-  result._slices = slices;
-  result._numberOfVerticalLines = numberOfVerticalLines;
+  result._leftHalfAngle = leftHalfAngle;
+  result._rightHalfAngle = rightHalfAngle;
+  result._frontHalfAngle = frontHalfAngle;
+  result._backHalfAngle = backHalfAngle;
   result._offsetAttribute =
     offsetAttribute === -1 ? undefined : offsetAttribute;
-
   return result;
 };
 
 /**
  * Computes the geometric representation of an outline of a rectangleSensor, including its vertices, indices, and a bounding sphere.
  *
- * @param {RectangleSensorOutlineGeometry} rectangleSensorGeometry A description of the rectangleSensor outline.
+ * @param {RectangleSensorOutlineGeometry} RectangleSensorOutlineGeometry A description of the rectangleSensor outline.
  * @returns {Geometry|undefined} The computed vertices and indices.
  */
 RectangleSensorOutlineGeometry.createGeometry = function (rectangleSensorGeometry) {
   var length = rectangleSensorGeometry._length;
-  var topRadius = rectangleSensorGeometry._topRadius;
-  var bottomRadius = rectangleSensorGeometry._bottomRadius;
-  var slices = rectangleSensorGeometry._slices;
-  var numberOfVerticalLines = rectangleSensorGeometry._numberOfVerticalLines;
+  var leftHalfAngle = rectangleSensorGeometry._leftHalfAngle;
+  var rightHalfAngle = rectangleSensorGeometry._rightHalfAngle;
+  var frontHalfAngle = rectangleSensorGeometry._frontHalfAngle;
+  var backHalfAngle = rectangleSensorGeometry._backHalfAngle;
 
   if (
     length <= 0 ||
-    topRadius < 0 ||
-    bottomRadius < 0 ||
-    (topRadius === 0 && bottomRadius === 0)
+    leftHalfAngle <= 0 ||
+    rightHalfAngle <= 0 ||
+    frontHalfAngle <= 0 ||
+    (backHalfAngle <= 0)
   ) {
     return;
   }
 
-  var numVertices = slices * 2;
-
-  var positions = CylinderGeometryLibrary.computePositions(
-    length,
-    topRadius,
-    bottomRadius,
-    slices,
-    false
-  );
-  var numIndices = slices * 2;
-  var numSide;
-  if (numberOfVerticalLines > 0) {
-    var numSideLines = Math.min(numberOfVerticalLines, slices);
-    numSide = Math.round(slices / numSideLines);
-    numIndices += numSideLines;
-  }
-
-  var indices = IndexDatatype.createTypedArray(numVertices, numIndices * 2);
+  // buffers
+  var positionIndex = 0;
   var index = 0;
-  var i;
-  for (i = 0; i < slices - 1; i++) {
-    indices[index++] = i;
-    indices[index++] = i + 1;
-    indices[index++] = i + slices;
-    indices[index++] = i + 1 + slices;
-  }
+  // 上下顶 + 外面 + 内面
+  var vertexCount = 10;
+  // 上下面 + 内外面 + 2个截面
+  var numIndices = 28;
+  var indices  = IndexDatatype.createTypedArray(vertexCount, numIndices);
+  var positions = new Float64Array(vertexCount * 3);
 
-  indices[index++] = slices - 1;
+  let height_over_two = length / 2;
+  let height_three_over_two = 3 * height_over_two;
+  let front_length = length * Math.sin(frontHalfAngle);
+  let back_length = length * Math.sin(backHalfAngle);
+  let left_length = length * Math.sin(leftHalfAngle);
+  let right_length = length * Math.sin(rightHalfAngle);
+  // 顶点 0
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = -height_over_two;
+  // 左上 1
+  positions[positionIndex++] = -left_length;
+  positions[positionIndex++] = front_length;
+  positions[positionIndex++] = -height_three_over_two;
+  // 中上点 2
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = front_length;
+  positions[positionIndex++] = -height_three_over_two;
+  // 右上 3
+  positions[positionIndex++] = right_length;
+  positions[positionIndex++] = front_length;
+  positions[positionIndex++] = -height_three_over_two;
+  // 右中点 4
+  positions[positionIndex++] = right_length;
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = -height_three_over_two;
+  // 右下 5
+  positions[positionIndex++] = right_length;
+  positions[positionIndex++] = -back_length;
+  positions[positionIndex++] = -height_three_over_two;
+  // 中下点 6
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = -back_length;
+  positions[positionIndex++] = -height_three_over_two;
+  // 左下 7
+  positions[positionIndex++] = -left_length;
+  positions[positionIndex++] = -back_length;
+  positions[positionIndex++] = -height_three_over_two;
+  // 左中点 8
+  positions[positionIndex++] = -left_length;
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = -height_three_over_two;
+  // 底面中心 9
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = -height_three_over_two;
+
+  // line
   indices[index++] = 0;
-  indices[index++] = slices + slices - 1;
-  indices[index++] = slices;
+  indices[index++] = 1;
+  indices[index++] = 0;
+  indices[index++] = 2;
+  indices[index++] = 0;
+  indices[index++] = 3;
+  indices[index++] = 0;
+  indices[index++] = 4;
+  indices[index++] = 0;
+  indices[index++] = 5;
+  indices[index++] = 0;
+  indices[index++] = 6;
+  indices[index++] = 0;
+  indices[index++] = 7;
+  indices[index++] = 0;
+  indices[index++] = 8;
+  indices[index++] = 1;
+  indices[index++] = 3;
+  indices[index++] = 3;
+  indices[index++] = 5;
+  indices[index++] = 5;
+  indices[index++] = 7;
+  indices[index++] = 7;
+  indices[index++] = 1;
+  indices[index++] = 2;
+  indices[index++] = 6;
+  indices[index++] = 4;
+  indices[index++] = 8;
 
-  if (numberOfVerticalLines > 0) {
-    for (i = 0; i < slices; i += numSide) {
-      indices[index++] = i;
-      indices[index++] = i + slices;
-    }
-  }
+  console.log(index);
+  console.log(numIndices);
+  console.log(positionIndex / 3);
+  console.log(vertexCount);
 
   var attributes = new GeometryAttributes();
   attributes.position = new GeometryAttribute({
@@ -237,11 +284,12 @@ RectangleSensorOutlineGeometry.createGeometry = function (rectangleSensorGeometr
     values: positions,
   });
 
-  radiusScratch.x = length * 0.5;
-  radiusScratch.y = Math.max(bottomRadius, topRadius);
+  var radiusScratch = new Cartesian2();
+  radiusScratch.x = length;
+  radiusScratch.y = Math.max(Math.max(left_length,right_length,front_length,back_length));
 
   var boundingSphere = new BoundingSphere(
-    Cartesian3.ZERO,
+    new Cartesian3(0, 0, -length/2),
     Cartesian2.magnitude(radiusScratch)
   );
 

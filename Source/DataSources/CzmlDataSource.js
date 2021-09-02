@@ -2525,8 +2525,8 @@ function processCylinder(entity, packet, entityCollection, sourceUri) {
   processPacketData(
     Number,
     cylinder,
-    "topRadius",
-    cylinderData.topRadius,
+    "topInnerRadius",
+    cylinderData.topInnerRadius,
     interval,
     sourceUri,
     entityCollection
@@ -2534,8 +2534,62 @@ function processCylinder(entity, packet, entityCollection, sourceUri) {
   processPacketData(
     Number,
     cylinder,
-    "bottomRadius",
-    cylinderData.bottomRadius,
+    "topOuterRadius",
+    cylinderData.topOuterRadius,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    cylinder,
+    "bottomInnerRadius",
+    cylinderData.bottomInnerRadius,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    cylinder,
+    "bottomOuterRadius",
+    cylinderData.bottomOuterRadius,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    cylinder,
+    "thetaSegments",
+    cylinderData.thetaSegments,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    cylinder,
+    "phiSegments",
+    cylinderData.phiSegments,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    cylinder,
+    "thetaStart",
+    cylinderData.thetaStart,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    cylinder,
+    "thetaLength",
+    cylinderData.thetaLength,
     interval,
     sourceUri,
     entityCollection

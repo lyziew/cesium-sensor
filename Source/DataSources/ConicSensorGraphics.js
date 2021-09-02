@@ -12,8 +12,14 @@ import createPropertyDescriptor from "./createPropertyDescriptor.js";
  *
  * @property {Property | boolean} [show=true] A boolean Property specifying the visibility of the conicSensor.
  * @property {Property | number} [length] A numeric Property specifying the length of the conicSensor.
- * @property {Property | number} [topRadius] A numeric Property specifying the radius of the top of the conicSensor.
- * @property {Property | number} [bottomRadius] A numeric Property specifying the radius of the bottom of the conicSensor.
+ * @property {Property | number} [topInnerRadius] A numeric Property specifying the radius of the top of the conicSensor.
+ * @property {Property | number} [topOuterRadius] A numeric Property specifying the radius of the top of the conicSensor.
+ * @property {Property | number} [bottomInnerRadius] A numeric Property specifying the radius of the bottom of the conicSensor.
+ * @property {Property | number} [bottomOuterRadius] A numeric Property specifying the radius of the bottom of the conicSensor.
+ * @property {Property | number} [thetaSegments] A numeric Property specifying the radius of the bottom of the conicSensor.
+ * @property {Property | number} [phiSegments] A numeric Property specifying the radius of the bottom of the conicSensor.
+ * @property {Property | number} [thetaStart] A numeric Property specifying the radius of the bottom of the conicSensor.
+ * @property {Property | number} [offsetAttribute] A numeric Property specifying the radius of the bottom of the conicSensor.
  * @property {Property | HeightReference} [heightReference=HeightReference.NONE] A Property specifying what the height from the entity position is relative to.
  * @property {Property | boolean} [fill=true] A boolean Property specifying whether the conicSensor is filled with the provided material.
  * @property {MaterialProperty | Color} [material=Color.WHITE] A Property specifying the material used to fill the conicSensor.
@@ -41,10 +47,22 @@ function ConicSensorGraphics(options) {
   this._showSubscription = undefined;
   this._length = undefined;
   this._lengthSubscription = undefined;
-  this._topRadius = undefined;
-  this._topRadiusSubscription = undefined;
-  this._bottomRadius = undefined;
-  this._bottomRadiusSubscription = undefined;
+  this._topInnerRadius = undefined;
+  this._topInnerRadiusSubscription = undefined;
+  this._topOuterRadius = undefined;
+  this._topOuterRadiusSubscription = undefined;
+  this._bottomInnerRadius = undefined;
+  this._bottomInnerRadiusSubscription = undefined;
+  this._bottomOuterRadius = undefined;
+  this._bottomOuterRadiusSubscription = undefined;
+  this._thetaSegments = undefined;
+  this._thetaSegmentsSubscription = undefined;
+  this._phiSegments = undefined;
+  this._phiSegmentsSubscription = undefined;
+  this._thetaStart = undefined;
+  this._thetaStartSubscription = undefined;
+  this._thetaLength = undefined;
+  this._thetaLengthSubscription = undefined;
   this._heightReference = undefined;
   this._heightReferenceSubscription = undefined;
   this._fill = undefined;
@@ -103,14 +121,55 @@ Object.defineProperties(ConicSensorGraphics.prototype, {
    * @memberof ConicSensorGraphics.prototype
    * @type {Property|undefined}
    */
-  topRadius: createPropertyDescriptor("topRadius"),
+  topInnerRadius: createPropertyDescriptor("topInnerRadius"),
 
   /**
    * Gets or sets the numeric Property specifying the radius of the bottom of the conicSensor.
    * @memberof ConicSensorGraphics.prototype
    * @type {Property|undefined}
    */
-  bottomRadius: createPropertyDescriptor("bottomRadius"),
+  topOuterRadius: createPropertyDescriptor("topOuterRadius"),
+
+  /**
+   * Gets or sets the numeric Property specifying the radius of the bottom of the conicSensor.
+   * @memberof ConicSensorGraphics.prototype
+   * @type {Property|undefined}
+   */
+  bottomInnerRadius: createPropertyDescriptor("bottomInnerRadius"),
+
+  /**
+   * Gets or sets the numeric Property specifying the radius of the bottom of the conicSensor.
+   * @memberof ConicSensorGraphics.prototype
+   * @type {Property|undefined}
+   */
+  bottomOuterRadius: createPropertyDescriptor("bottomOuterRadius"),
+  /**
+   * Gets or sets the numeric Property specifying the radius of the bottom of the conicSensor.
+   * @memberof ConicSensorGraphics.prototype
+   * @type {Property|undefined}
+   */
+  thetaSegments: createPropertyDescriptor("thetaSegments"),
+
+  /**
+   * Gets or sets the numeric Property specifying the radius of the bottom of the conicSensor.
+   * @memberof ConicSensorGraphics.prototype
+   * @type {Property|undefined}
+   */
+  phiSegments: createPropertyDescriptor("phiSegments"),
+
+  /**
+   * Gets or sets the numeric Property specifying the radius of the bottom of the conicSensor.
+   * @memberof ConicSensorGraphics.prototype
+   * @type {Property|undefined}
+   */
+  thetaStart: createPropertyDescriptor("thetaStart"),
+
+  /**
+   * Gets or sets the numeric Property specifying the radius of the bottom of the conicSensor.
+   * @memberof ConicSensorGraphics.prototype
+   * @type {Property|undefined}
+   */
+  thetaLength: createPropertyDescriptor("thetaLength"),
 
   /**
    * Gets or sets the Property specifying the {@link HeightReference}.
@@ -207,8 +266,14 @@ ConicSensorGraphics.prototype.clone = function (result) {
   }
   result.show = this.show;
   result.length = this.length;
-  result.topRadius = this.topRadius;
-  result.bottomRadius = this.bottomRadius;
+  result.topInnerRadius = this.topInnerRadius;
+  result.topOuterRadius = this.topOuterRadius;
+  result.bottomInnerRadius = this.bottomInnerRadius;
+  result.bottomOuterRadius = this.bottomOuterRadius;
+  result.thetaSegments = this.thetaSegments;
+  result.phiSegments = this.phiSegments;
+  result.thetaStart = this.thetaStart;
+  result.thetaLength = this.thetaLength;
   result.heightReference = this.heightReference;
   result.fill = this.fill;
   result.material = this.material;
@@ -237,8 +302,14 @@ ConicSensorGraphics.prototype.merge = function (source) {
 
   this.show = defaultValue(this.show, source.show);
   this.length = defaultValue(this.length, source.length);
-  this.topRadius = defaultValue(this.topRadius, source.topRadius);
-  this.bottomRadius = defaultValue(this.bottomRadius, source.bottomRadius);
+  this.topInnerRadius = defaultValue(this.topInnerRadius, source.topInnerRadius);
+  this.topOuterRadius = defaultValue(this.topOuterRadius, source.topOuterRadius);
+  this.bottomInnerRadius = defaultValue(this.bottomInnerRadius, source.bottomInnerRadius);
+  this.bottomOuterRadius = defaultValue(this.bottomOuterRadius, source.bottomOuterRadius);
+  this.thetaSegments = defaultValue(this.thetaSegments ,source.thetaSegments);
+  this.phiSegments = defaultValue(this.phiSegments ,source.phiSegments);
+  this.thetaStart = defaultValue(this.thetaStart ,source.thetaStart);
+  this.thetaLength = defaultValue(this.thetaLength ,source.thetaLength);
   this.heightReference = defaultValue(
     this.heightReference,
     source.heightReference
