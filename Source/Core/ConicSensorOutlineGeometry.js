@@ -261,7 +261,7 @@ ConicSensorOutlineGeometry.createGeometry = function (conicSensorGeometry) {
       let y = radius * Math.sin(segment);
       positions[positionIndex++] = x;
       positions[positionIndex++] = y;
-      positions[positionIndex++] = -length / 2 ;
+      positions[positionIndex++] = 0;
     }
     // increase the radius for next row of vertices
     radius += radiusStep;
@@ -303,7 +303,7 @@ ConicSensorOutlineGeometry.createGeometry = function (conicSensorGeometry) {
       let y = radius * Math.sin(segment);
       positions[positionIndex++] = x;
       positions[positionIndex++] = y;
-      positions[positionIndex++] = -length / 2 * 3;
+      positions[positionIndex++] = -length;
     }
     // increase the radius for next row of vertices
     radius += radiusStep;
@@ -341,10 +341,10 @@ ConicSensorOutlineGeometry.createGeometry = function (conicSensorGeometry) {
     let sin = Math.sin(segment);
     positions[positionIndex++] = topInnerRadius * cos;
     positions[positionIndex++] = topInnerRadius * sin;
-    positions[positionIndex++] = -length / 2;
+    positions[positionIndex++] = 0;
     positions[positionIndex++] = bottomInnerRadius * cos;
     positions[positionIndex++] = bottomInnerRadius * sin;
-    positions[positionIndex++] = -length / 2 * 3;
+    positions[positionIndex++] = -length;
   }
 
   let innserStart = (phiSegments + 1) * (thetaSegments + 1) * 2;
@@ -363,11 +363,11 @@ ConicSensorOutlineGeometry.createGeometry = function (conicSensorGeometry) {
     let sin = Math.sin(segment);
     positions[positionIndex++] = topOuterRadius * cos;
     positions[positionIndex++] = topOuterRadius * sin;
-    positions[positionIndex++] = -length / 2;
+    positions[positionIndex++] = 0;
 
     positions[positionIndex++] = bottomOuterRadius * cos;
     positions[positionIndex++] = bottomOuterRadius * sin;
-    positions[positionIndex++] = -length / 2 * 3;
+    positions[positionIndex++] = -length;
   }
 
   let outerStart = (phiSegments + 1) * (thetaSegments + 1) * 2 + (thetaSegments + 1) * 2;
@@ -379,8 +379,8 @@ ConicSensorOutlineGeometry.createGeometry = function (conicSensorGeometry) {
     indices[index++] = b;
   }
 
-  console.log(index);
-  console.log(numIndices);
+  // console.log(index);
+  // console.log(numIndices);
 
   let attributes = new GeometryAttributes();
   attributes.position = new GeometryAttribute({
@@ -394,7 +394,7 @@ ConicSensorOutlineGeometry.createGeometry = function (conicSensorGeometry) {
   radiusScratch.y = Math.max(topOuterRadius,bottomOuterRadius);
 
   let boundingSphere = new BoundingSphere(
-    new Cartesian3(0, 0, -length/2),
+    new Cartesian3(0, 0, 0),
     Cartesian2.magnitude(radiusScratch)
   );
 

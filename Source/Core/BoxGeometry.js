@@ -239,17 +239,6 @@ BoxGeometry.unpack = function (array, startingIndex, result) {
 };
 
 /**
- * VertexFormat包含
- * bitangent 副切线
- * color 颜色
- * normal 法线
- * position 位置
- * st 2D纹理坐标
- * tangent 切线
- */
-
-
-/**
  * Computes the geometric representation of a box, including its vertices, indices, and a bounding sphere.
  *
  * @param {BoxGeometry} boxGeometry A description of the box.
@@ -466,8 +455,7 @@ BoxGeometry.createGeometry = function (boxGeometry) {
 
     if (vertexFormat.st) {
       var texCoords = new Float32Array(6 * 4 * 2);
-      // st即如果贴纹理
-      //
+
       // +z face
       texCoords[0] = 0.0;
       texCoords[1] = 0.0;
@@ -860,9 +848,7 @@ BoxGeometry.createGeometry = function (boxGeometry) {
     indices[35] = 4;
   }
 
-  // 差
   var diff = Cartesian3.subtract(max, min, diffScratch);
-  // 计算长度
   var radius = Cartesian3.magnitude(diff) * 0.5;
 
   if (defined(boxGeometry._offsetAttribute)) {

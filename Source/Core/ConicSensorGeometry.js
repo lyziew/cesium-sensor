@@ -23,9 +23,14 @@ import VertexFormat from "./VertexFormat.js";
  *
  * @param {Object} options Object with the following properties:
  * @param {Number} options.length The length of the conicSensor.
- * @param {Number} options.topRadius The radius of the top of the conicSensor.
- * @param {Number} options.bottomRadius The radius of the bottom of the conicSensor.
- * @param {Number} [options.slices=128] The number of edges around the perimeter of the conicSensor.
+ * @param {Number} options.topInnerRadius The radius of the top of the conicSensor.
+ * @param {Number} options.topOuterRadius The radius of the top of the conicSensor.
+ * @param {Number} options.bottomInnerRadius The radius of the bottom of the conicSensor.
+ * @param {Number} options.bottomOuterRadius The radius of the bottom of the conicSensor.
+ * @param {Number} [options.thetaSegments=32] The number of edges around the perimeter of the conicSensor.
+ * @param {Number} [options.phiSegments=1] The number of edges around the perimeter of the conicSensor.
+ * @param {Number} [options.thetaStart=0] The number of edges around the perimeter of the conicSensor.
+ * @param {Number} [options.thetaLength=CesiumMath.TWO_PI] The number of edges around the perimeter of the conicSensor.
  * @param {VertexFormat} [options.vertexFormat=VertexFormat.DEFAULT] The vertex attributes to be computed.
  *
  * @exception {DeveloperError} options.slices must be greater than or equal to 3.
@@ -306,7 +311,7 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
 
       positions[positionIndex++] = x;
       positions[positionIndex++] = y;
-      positions[positionIndex++] = -length / 2 ;
+      positions[positionIndex++] = 0;
 
       if (vertexFormat.normal || vertexFormat.tangent || vertexFormat.bitangent) {
         // normal
@@ -381,7 +386,7 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
       let y = radius * Math.sin(segment);
       positions[positionIndex++] = x;
       positions[positionIndex++] = y;
-      positions[positionIndex++] = -length / 2 * 3;
+      positions[positionIndex++] = -length;
 
       if (vertexFormat.normal || vertexFormat.tangent || vertexFormat.bitangent) {
         // normal
@@ -448,10 +453,10 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
     let sin = Math.sin(segment);
     positions[positionIndex++] = topInnerRadius * cos;
     positions[positionIndex++] = topInnerRadius * sin;
-    positions[positionIndex++] = -length / 2;
+    positions[positionIndex++] = 0;
     positions[positionIndex++] = bottomInnerRadius * cos;
     positions[positionIndex++] = bottomInnerRadius * sin;
-    positions[positionIndex++] = -length / 2 * 3;
+    positions[positionIndex++] = -length;
 
     let theta = Math.atan2(Math.abs(topInnerRadius - bottomInnerRadius), length);
     let normalScale = Math.cos(theta);
@@ -537,11 +542,11 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
     let sin = Math.sin(segment);
     positions[positionIndex++] = topOuterRadius * cos;
     positions[positionIndex++] = topOuterRadius * sin;
-    positions[positionIndex++] = -length / 2;
+    positions[positionIndex++] = 0;
 
     positions[positionIndex++] = bottomOuterRadius * cos;
     positions[positionIndex++] = bottomOuterRadius * sin;
-    positions[positionIndex++] = -length / 2 * 3;
+    positions[positionIndex++] = -length;
 
     let theta = Math.atan2(Math.abs(bottomOuterRadius - topOuterRadius), length);
     let normalScale = Math.cos(theta);
@@ -647,8 +652,8 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
     indices[index++] = oed;
   }
 
-  console.log(index);
-  console.log(numIndices);
+  // console.log(index);
+  // console.log(numIndices);
 
   let attributes = new GeometryAttributes();
   if (vertexFormat.position) {
@@ -696,7 +701,7 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
   radiusScratch.y = Math.max(topOuterRadius,bottomOuterRadius);
 
   let boundingSphere = new BoundingSphere(
-    new Cartesian3(0, 0, -length/2),
+    new Cartesian3(0, 0, 0),
     Cartesian2.magnitude(radiusScratch)
   );
 
@@ -714,6 +719,8 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
       values: applyOffset,
     });
   }
+
+  console.log(attributes);
 
   return new Geometry({
     attributes: attributes,

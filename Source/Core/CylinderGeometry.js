@@ -448,6 +448,8 @@ CylinderGeometry.createGeometry = function (cylinderGeometry) {
     });
   }
 
+  console.log(attributes);
+
   return new Geometry({
     attributes: attributes,
     indices: indices,

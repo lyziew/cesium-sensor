@@ -54,6 +54,7 @@ import ConstantPositionProperty from "./ConstantPositionProperty.js";
 import ConstantProperty from "./ConstantProperty.js";
 import CorridorGraphics from "./CorridorGraphics.js";
 import CylinderGraphics from "./CylinderGraphics.js";
+import ConicSensorGraphics from "./ConicSensorGraphics.js";
 import DataSource from "./DataSource.js";
 import DataSourceClock from "./DataSourceClock.js";
 import EllipseGraphics from "./EllipseGraphics.js";
@@ -79,6 +80,7 @@ import Property from "./Property.js";
 import PropertyArray from "./PropertyArray.js";
 import PropertyBag from "./PropertyBag.js";
 import RectangleGraphics from "./RectangleGraphics.js";
+import RectangleSensorGraphics from "./RectangleSensorGraphics.js";
 import ReferenceProperty from "./ReferenceProperty.js";
 import Rotation from "./Rotation.js";
 import SampledPositionProperty from "./SampledPositionProperty.js";
@@ -2525,8 +2527,8 @@ function processCylinder(entity, packet, entityCollection, sourceUri) {
   processPacketData(
     Number,
     cylinder,
-    "topInnerRadius",
-    cylinderData.topInnerRadius,
+    "topRadius",
+    cylinderData.topRadius,
     interval,
     sourceUri,
     entityCollection
@@ -2534,62 +2536,8 @@ function processCylinder(entity, packet, entityCollection, sourceUri) {
   processPacketData(
     Number,
     cylinder,
-    "topOuterRadius",
-    cylinderData.topOuterRadius,
-    interval,
-    sourceUri,
-    entityCollection
-  );
-  processPacketData(
-    Number,
-    cylinder,
-    "bottomInnerRadius",
-    cylinderData.bottomInnerRadius,
-    interval,
-    sourceUri,
-    entityCollection
-  );
-  processPacketData(
-    Number,
-    cylinder,
-    "bottomOuterRadius",
-    cylinderData.bottomOuterRadius,
-    interval,
-    sourceUri,
-    entityCollection
-  );
-  processPacketData(
-    Number,
-    cylinder,
-    "thetaSegments",
-    cylinderData.thetaSegments,
-    interval,
-    sourceUri,
-    entityCollection
-  );
-  processPacketData(
-    Number,
-    cylinder,
-    "phiSegments",
-    cylinderData.phiSegments,
-    interval,
-    sourceUri,
-    entityCollection
-  );
-  processPacketData(
-    Number,
-    cylinder,
-    "thetaStart",
-    cylinderData.thetaStart,
-    interval,
-    sourceUri,
-    entityCollection
-  );
-  processPacketData(
-    Number,
-    cylinder,
-    "thetaLength",
-    cylinderData.thetaLength,
+    "bottomRadius",
+    cylinderData.bottomRadius,
     interval,
     sourceUri,
     entityCollection
@@ -2679,6 +2627,199 @@ function processCylinder(entity, packet, entityCollection, sourceUri) {
     cylinder,
     "distanceDisplayCondition",
     cylinderData.distanceDisplayCondition,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+}
+
+function processConicSensor(entity, packet, entityCollection, sourceUri) {
+  var conicSensorData = packet.conicSensor;
+  if (!defined(conicSensorData)) {
+    return;
+  }
+
+  var interval = intervalFromString(conicSensorData.interval);
+  var conicSensor = entity.conicSensor;
+  if (!defined(conicSensor)) {
+    entity.conicSensor = conicSensor = new ConicSensorGraphics();
+  }
+
+  processPacketData(
+    Boolean,
+    conicSensor,
+    "show",
+    conicSensorData.show,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    conicSensor,
+    "length",
+    conicSensorData.length,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    conicSensor,
+    "topInnerRadius",
+    conicSensorData.topRadius,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    conicSensor,
+    "topOuterRadius",
+    conicSensorData.topRadius,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    conicSensor,
+    "bottomInnerRadius",
+    conicSensorData.bottomRadius,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    conicSensor,
+    "bottomOuterRadius",
+    conicSensorData.bottomRadius,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    conicSensor,
+    "thetaSegments",
+    conicSensorData.bottomRadius,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    conicSensor,
+    "phiSegments",
+    conicSensorData.bottomRadius,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    conicSensor,
+    "thetaStart",
+    conicSensorData.bottomRadius,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    conicSensor,
+    "thetaLength",
+    conicSensorData.bottomRadius,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    HeightReference,
+    conicSensor,
+    "heightReference",
+    conicSensorData.heightReference,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Boolean,
+    conicSensor,
+    "fill",
+    conicSensorData.fill,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processMaterialPacketData(
+    conicSensor,
+    "material",
+    conicSensorData.material,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Boolean,
+    conicSensor,
+    "outline",
+    conicSensorData.outline,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Color,
+    conicSensor,
+    "outlineColor",
+    conicSensorData.outlineColor,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    conicSensor,
+    "outlineWidth",
+    conicSensorData.outlineWidth,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    conicSensor,
+    "numberOfVerticalLines",
+    conicSensorData.numberOfVerticalLines,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    conicSensor,
+    "slices",
+    conicSensorData.slices,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    ShadowMode,
+    conicSensor,
+    "shadows",
+    conicSensorData.shadows,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    DistanceDisplayCondition,
+    conicSensor,
+    "distanceDisplayCondition",
+    conicSensorData.distanceDisplayCondition,
     interval,
     sourceUri,
     entityCollection
@@ -4521,6 +4662,199 @@ function processRectangle(entity, packet, entityCollection, sourceUri) {
   );
 }
 
+function processRectangleSensor(entity, packet, entityCollection, sourceUri) {
+  var rectangleSensorData = packet.rectangleSensor;
+  if (!defined(rectangleSensorData)) {
+    return;
+  }
+
+  var interval = intervalFromString(rectangleSensorData.interval);
+  var rectangleSensor = entity.rectangleSensor;
+  if (!defined(rectangleSensor)) {
+    entity.rectangleSensor = rectangleSensor = new RectangleSensorGraphics();
+  }
+
+  processPacketData(
+    Boolean,
+    rectangleSensor,
+    "show",
+    rectangleSensorData.show,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    rectangleSensor,
+    "length",
+    rectangleSensorData.length,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    rectangleSensor,
+    "topInnerRadius",
+    rectangleSensorData.topRadius,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    rectangleSensor,
+    "topOuterRadius",
+    rectangleSensorData.topRadius,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    rectangleSensor,
+    "bottomInnerRadius",
+    rectangleSensorData.bottomRadius,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    rectangleSensor,
+    "bottomOuterRadius",
+    rectangleSensorData.bottomRadius,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    rectangleSensor,
+    "thetaSegments",
+    rectangleSensorData.bottomRadius,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    rectangleSensor,
+    "phiSegments",
+    rectangleSensorData.bottomRadius,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    rectangleSensor,
+    "thetaStart",
+    rectangleSensorData.bottomRadius,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    rectangleSensor,
+    "thetaLength",
+    rectangleSensorData.bottomRadius,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    HeightReference,
+    rectangleSensor,
+    "heightReference",
+    rectangleSensorData.heightReference,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Boolean,
+    rectangleSensor,
+    "fill",
+    rectangleSensorData.fill,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processMaterialPacketData(
+    rectangleSensor,
+    "material",
+    rectangleSensorData.material,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Boolean,
+    rectangleSensor,
+    "outline",
+    rectangleSensorData.outline,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Color,
+    rectangleSensor,
+    "outlineColor",
+    rectangleSensorData.outlineColor,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    rectangleSensor,
+    "outlineWidth",
+    rectangleSensorData.outlineWidth,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    rectangleSensor,
+    "numberOfVerticalLines",
+    rectangleSensorData.numberOfVerticalLines,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    rectangleSensor,
+    "slices",
+    rectangleSensorData.slices,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    ShadowMode,
+    rectangleSensor,
+    "shadows",
+    rectangleSensorData.shadows,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    DistanceDisplayCondition,
+    rectangleSensor,
+    "distanceDisplayCondition",
+    rectangleSensorData.distanceDisplayCondition,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+}
+
 function processTileset(entity, packet, entityCollection, sourceUri) {
   var tilesetData = packet.tileset;
   if (!defined(tilesetData)) {
@@ -5048,6 +5382,7 @@ CzmlDataSource.updaters = [
   processBox, //
   processCorridor, //
   processCylinder, //
+  processConicSensor, //
   processEllipse, //
   processEllipsoid, //
   processLabel, //
@@ -5061,6 +5396,7 @@ CzmlDataSource.updaters = [
   processPolylineVolume, //
   processProperties, //
   processRectangle, //
+  processRectangleSensor, //
   processPosition, //
   processTileset, //
   processViewFrom, //

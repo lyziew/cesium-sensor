@@ -856,7 +856,7 @@ GeometryPipeline.transformToWorldCoordinates = function (instance) {
   }
 
   var attributes = instance.geometry.attributes;
-
+  console.log(attributes);
   // Transform attributes in known vertex formats
   transformPoint(modelMatrix, attributes.position);
   transformPoint(modelMatrix, attributes.prevPosition);

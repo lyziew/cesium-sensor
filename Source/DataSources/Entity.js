@@ -36,6 +36,7 @@ import PolylineVolumeGraphics from "./PolylineVolumeGraphics.js";
 import Property from "./Property.js";
 import PropertyBag from "./PropertyBag.js";
 import RectangleGraphics from "./RectangleGraphics.js";
+import RectangleSensorGraphics from "./RectangleSensorGraphics";
 import WallGraphics from "./WallGraphics.js";
 
 var cartoScratch = new Cartographic();
@@ -93,6 +94,7 @@ function createPropertyTypeDescriptor(name, Type) {
  * @property {PropertyBag | Object.<string,*>} [properties] Arbitrary properties to associate with this entity.
  * @property {PolylineVolumeGraphics | PolylineVolumeGraphics.ConstructorOptions} [polylineVolume] A polylineVolume to associate with this entity.
  * @property {RectangleGraphics | RectangleGraphics.ConstructorOptions} [rectangle] A rectangle to associate with this entity.
+ * @property {RectangleSensorGraphics | RectangleSensorGraphics.ConstructorOptions} [rectangleSensor] A rectangleSensor to associate with this entity.
  * @property {WallGraphics | WallGraphics.ConstructorOptions} [wall] A wall to associate with this entity.
  */
 
@@ -143,6 +145,7 @@ function Entity(options) {
     "position",
     "properties",
     "rectangle",
+    "rectangleSensor",
     "viewFrom",
     "wall",
   ];
@@ -155,7 +158,7 @@ function Entity(options) {
   this._corridorSubscription = undefined;
   this._cylinder = undefined;
   this._cylinderSubscription = undefined;
-  this.conicSensor = undefined;
+  this._conicSensor = undefined;
   this._conicSensorSubscription = undefined;
   this._description = undefined;
   this._descriptionSubscription = undefined;
@@ -189,6 +192,8 @@ function Entity(options) {
   this._propertiesSubscription = undefined;
   this._rectangle = undefined;
   this._rectangleSubscription = undefined;
+  this._rectangleSensor = undefined;
+  this._rectangleSensorSubscription = undefined;
   this._viewFrom = undefined;
   this._viewFromSubscription = undefined;
   this._wall = undefined;
@@ -381,7 +386,6 @@ Object.defineProperties(Entity.prototype, {
    * @type {CylinderGraphics|undefined}
    */
   cylinder: createPropertyTypeDescriptor("cylinder", CylinderGraphics),
-
   /**
    * Gets or sets the conicSensor.
    * @memberof Entity.prototype
@@ -487,6 +491,12 @@ Object.defineProperties(Entity.prototype, {
    * @type {RectangleGraphics|undefined}
    */
   rectangle: createPropertyTypeDescriptor("rectangle", RectangleGraphics),
+  /**
+   * Gets or sets the rectangleSensor.
+   * @memberof Entity.prototype
+   * @type {RectangleSensorGraphics|undefined}
+   */
+  rectangleSensor: createPropertyTypeDescriptor("rectangleSensor", RectangleSensorGraphics),
   /**
    * Gets or sets the suggested initial offset when tracking this object.
    * The offset is typically defined in the east-north-up reference frame,

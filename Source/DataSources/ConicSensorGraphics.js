@@ -19,6 +19,7 @@ import createPropertyDescriptor from "./createPropertyDescriptor.js";
  * @property {Property | number} [thetaSegments] A numeric Property specifying the radius of the bottom of the conicSensor.
  * @property {Property | number} [phiSegments] A numeric Property specifying the radius of the bottom of the conicSensor.
  * @property {Property | number} [thetaStart] A numeric Property specifying the radius of the bottom of the conicSensor.
+ * @property {Property | number} [thetaLength] A numeric Property specifying the radius of the bottom of the conicSensor.
  * @property {Property | number} [offsetAttribute] A numeric Property specifying the radius of the bottom of the conicSensor.
  * @property {Property | HeightReference} [heightReference=HeightReference.NONE] A Property specifying what the height from the entity position is relative to.
  * @property {Property | boolean} [fill=true] A boolean Property specifying whether the conicSensor is filled with the provided material.

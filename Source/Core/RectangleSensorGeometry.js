@@ -15,6 +15,11 @@ import CesiumMath from "./Math.js";
 import PrimitiveType from "./PrimitiveType.js";
 import VertexFormat from "./VertexFormat.js";
 
+var radiusScratch = new Cartesian2();
+var normalScratch = new Cartesian3();
+var bitangentScratch = new Cartesian3();
+var tangentScratch = new Cartesian3();
+var positionScratch = new Cartesian3();
 /**
  * A description of a rectangleSensor.
  *
@@ -211,7 +216,7 @@ RectangleSensorGeometry.createGeometry = function (rectangleSensorGeometry) {
   var stIndex = 0;
   var index = 0;
   // 上下顶 + 外面 + 内面
-  var vertexCount = 10;
+  var vertexCount = 3 * 4 + 4;
   // 上下面 + 内外面 + 2个截面
   var numIndices = 18;
   var indices  = IndexDatatype.createTypedArray(vertexCount, numIndices);
@@ -227,114 +232,223 @@ RectangleSensorGeometry.createGeometry = function (rectangleSensorGeometry) {
                    : undefined;
   var st = vertexFormat.st ? new Float32Array(vertexCount * 2) : undefined;
 
-  let height_over_two = length / 2;
-  let height_three_over_two = 3 * height_over_two;
   let front_length = length * Math.sin(frontHalfAngle);
   let back_length = length * Math.sin(backHalfAngle);
   let left_length = length * Math.sin(leftHalfAngle);
   let right_length = length * Math.sin(rightHalfAngle);
   let x_length = left_length + right_length;
   let y_length = front_length + back_length;
-  // 顶点 0
+  // 前面
   positions[positionIndex++] = 0;
   positions[positionIndex++] = 0;
-  positions[positionIndex++] = -height_over_two;
-  // 左上 1
+  positions[positionIndex++] = 0;
   positions[positionIndex++] = -left_length;
   positions[positionIndex++] = front_length;
-  positions[positionIndex++] = -height_three_over_two;
-  // 中上点 2
-  positions[positionIndex++] = 0;
-  positions[positionIndex++] = front_length;
-  positions[positionIndex++] = -height_three_over_two;
-  // 右上 3
+  positions[positionIndex++] = -length;
   positions[positionIndex++] = right_length;
   positions[positionIndex++] = front_length;
-  positions[positionIndex++] = -height_three_over_two;
-  // 右中点 4
-  positions[positionIndex++] = right_length;
-  positions[positionIndex++] = 0;
-  positions[positionIndex++] = -height_three_over_two;
-  // 右下 5
-  positions[positionIndex++] = right_length;
-  positions[positionIndex++] = -back_length;
-  positions[positionIndex++] = -height_three_over_two;
-  // 中下点 6
-  positions[positionIndex++] = 0;
-  positions[positionIndex++] = -back_length;
-  positions[positionIndex++] = -height_three_over_two;
-  // 左下 7
-  positions[positionIndex++] = -left_length;
-  positions[positionIndex++] = -back_length;
-  positions[positionIndex++] = -height_three_over_two;
-  // 左中点 8
-  positions[positionIndex++] = -left_length;
-  positions[positionIndex++] = 0;
-  positions[positionIndex++] = -height_three_over_two;
-  // 底面中心 9
-  positions[positionIndex++] = 0;
-  positions[positionIndex++] = 0;
-  positions[positionIndex++] = -height_three_over_two;
+  positions[positionIndex++] = -length;
 
-  //地面
-  if (vertexFormat.normal || vertexFormat.tangent || vertexFormat.bitangent) {
-    for(let i = 0; i < 4; i++) {
+  //右面
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = right_length;
+  positions[positionIndex++] = front_length;
+  positions[positionIndex++] = -length;
+  positions[positionIndex++] = right_length;
+  positions[positionIndex++] = -back_length;
+  positions[positionIndex++] = -length;
+
+  // 背面
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = right_length;
+  positions[positionIndex++] = -back_length;
+  positions[positionIndex++] = -length;
+  positions[positionIndex++] = -left_length;
+  positions[positionIndex++] = -back_length;
+  positions[positionIndex++] = -length;
+
+  //左面
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = 0;
+  positions[positionIndex++] = -left_length;
+  positions[positionIndex++] = -back_length;
+  positions[positionIndex++] = -length;
+  positions[positionIndex++] = -left_length;
+  positions[positionIndex++] = front_length;
+  positions[positionIndex++] = -length;
+
+  //底面
+  positions[positionIndex++] = -left_length;
+  positions[positionIndex++] = front_length;
+  positions[positionIndex++] = -length;
+  positions[positionIndex++] = right_length;
+  positions[positionIndex++] = front_length;
+  positions[positionIndex++] = -length;
+  positions[positionIndex++] = right_length;
+  positions[positionIndex++] = -back_length;
+  positions[positionIndex++] = -length;
+  positions[positionIndex++] = -left_length;
+  positions[positionIndex++] = -back_length;
+  positions[positionIndex++] = -length;
+
+  var angles = [frontHalfAngle,rightHalfAngle,backHalfAngle,leftHalfAngle];
+  var computeNormal =
+    vertexFormat.normal || vertexFormat.tangent || vertexFormat.bitangent;
+  for(let i=0; i<4;i++) {
+    if (computeNormal) {
+      var computeTangent = vertexFormat.tangent || vertexFormat.bitangent;
+      var normal = normalScratch;
+      var tangent = tangentScratch;
+      var bitangent = bitangentScratch;
+      var normalScale = 0.0;
+
+      if (computeTangent) {
+        tangent = Cartesian3.normalize(
+          Cartesian3.cross(Cartesian3.UNIT_Z, normal, tangent),
+          tangent
+        );
+      }
+
       // normal
       if (vertexFormat.normal) {
-        normals[normalIndex++] = 0;
-        normals[normalIndex++] = 0;
-        normals[normalIndex++] = -1;
+        normal.z = Math.sin(angles[i]);
+        normalScale = Math.cos(angles[i]);
+        normal.x = normalScale * Math.cos(0.25 * i * CesiumMath.TWO_PI);
+        normal.y = normalScale * Math.sin(0.25 * i * CesiumMath.TWO_PI);
+        normals[normalIndex++] = normal.x;
+        normals[normalIndex++] = normal.y;
+        normals[normalIndex++] = normal.z;
+        normals[normalIndex++] = normal.x;
+        normals[normalIndex++] = normal.y;
+        normals[normalIndex++] = normal.z;
+        normals[normalIndex++] = normal.x;
+        normals[normalIndex++] = normal.y;
+        normals[normalIndex++] = normal.z;
       }
       // tangent
       if (vertexFormat.tangent) {
-        tangents[tangentIndex++] = 1;
-        tangents[tangentIndex++] = 0;
-        tangents[tangentIndex++] = 0;
+        tangents[tangentIndex++] = tangent.x;
+        tangents[tangentIndex++] = tangent.y;
+        tangents[tangentIndex++] = tangent.z;
+        tangents[tangentIndex++] = tangent.x;
+        tangents[tangentIndex++] = tangent.y;
+        tangents[tangentIndex++] = tangent.z;
+        tangents[tangentIndex++] = tangent.x;
+        tangents[tangentIndex++] = tangent.y;
+        tangents[tangentIndex++] = tangent.z;
       }
       // bitangent
       if (vertexFormat.bitangent) {
-        bitangents[bitangentIndex++] = 0;
-        bitangents[bitangentIndex++] = -1;
-        bitangents[bitangentIndex++] = 0;
+        bitangent = Cartesian3.normalize(
+          Cartesian3.cross(normal, tangent, bitangent),
+          bitangent
+        );
+        bitangents[bitangentIndex++] = bitangent.x;
+        bitangents[bitangentIndex++] = bitangent.y;
+        bitangents[bitangentIndex++] = bitangent.z;
+        bitangents[bitangentIndex++] = bitangent.x;
+        bitangents[bitangentIndex++] = bitangent.y;
+        bitangents[bitangentIndex++] = bitangent.z;
+        bitangents[bitangentIndex++] = bitangent.x;
+        bitangents[bitangentIndex++] = bitangent.y;
+        bitangents[bitangentIndex++] = bitangent.z;
       }
     }
   }
-
+  //底面
+  if (vertexFormat.normal || vertexFormat.tangent || vertexFormat.bitangent) {
+    // normal
+    if (vertexFormat.normal) {
+      normals[normalIndex++] = 0.0;
+      normals[normalIndex++] = 0.0;
+      normals[normalIndex++] = -1.0;
+      normals[normalIndex++] = 0.0;
+      normals[normalIndex++] = 0.0;
+      normals[normalIndex++] = -1.0;
+      normals[normalIndex++] = 0.0;
+      normals[normalIndex++] = -0.0;
+      normals[normalIndex++] = -1.0;
+      normals[normalIndex++] = -0.0;
+      normals[normalIndex++] = -0.0;
+      normals[normalIndex++] = -1.0;
+    }
+    // tangent
+    if (vertexFormat.tangent) {
+      tangents[tangentIndex++] = -1.0;
+      tangents[tangentIndex++] = 0.0;
+      tangents[tangentIndex++] = 0.0;
+      tangents[tangentIndex++] = -1;
+      tangents[tangentIndex++] = 0.0;
+      tangents[tangentIndex++] = 0.0;
+      tangents[tangentIndex++] = -1.0;
+      tangents[tangentIndex++] = 0.0;
+      tangents[tangentIndex++] = 0.0;
+      tangents[tangentIndex++] = -1.0;
+      tangents[tangentIndex++] = 0.0;
+      tangents[tangentIndex++] = 0.0;
+    }
+    // bitangent
+    if (vertexFormat.bitangent) {
+      bitangents[bitangentIndex++] = 0.0;
+      bitangents[bitangentIndex++] = 1.0;
+      bitangents[bitangentIndex++] = 0.0;
+      bitangents[bitangentIndex++] = 0.0;
+      bitangents[bitangentIndex++] = 1.0;
+      bitangents[bitangentIndex++] = 0.0;
+      bitangents[bitangentIndex++] = 0.0;
+      bitangents[bitangentIndex++] = 1.0;
+      bitangents[bitangentIndex++] = 0.0;
+      bitangents[bitangentIndex++] = 0.0;
+      bitangents[bitangentIndex++] = 1.0;
+      bitangents[bitangentIndex++] = 0.0;
+    }
+  }
   // uv
   if (vertexFormat.st) {
-    st[stIndex++] = -left_length / x_length;
-    st[stIndex++] = front_length / y_length;
-    st[stIndex++] = right_length / x_length;
-    st[stIndex++] = front_length / y_length;
-    st[stIndex++] = right_length / x_length;
-    st[stIndex++] = -back_length / y_length;
-    st[stIndex++] = -left_length / x_length;
-    st[stIndex++] = -back_length / y_length;
+    for (i = 0; i < 3 * 4; i++) {
+      var position = Cartesian3.fromArray(positions, i * 3, positionScratch);
+      st[stIndex++] = (position.x + leftHalfAngle) / (leftHalfAngle + rightHalfAngle);
+      st[stIndex++] = (position.y + backHalfAngle) / (frontHalfAngle + backHalfAngle);
+    }
+
+    st[stIndex++] = 0.0;
+    st[stIndex++] = 1.0;
+    st[stIndex++] = 1.0;
+    st[stIndex++] = 1.0;
+    st[stIndex++] = 1.0;
+    st[stIndex++] = 0.0;
+    st[stIndex++] = 0.0;
+    st[stIndex++] = 0.0;
   }
 
   // face
   indices[index++] = 0;
-  indices[index++] = 3;
-  indices[index++] = 1;
-  indices[index++] = 0;
-  indices[index++] = 5;
-  indices[index++] = 3;
-  indices[index++] = 0;
-  indices[index++] = 7;
-  indices[index++] = 5;
-  indices[index++] = 0;
-  indices[index++] = 1;
-  indices[index++] = 7;
+  indices[index++] = 2;
   indices[index++] = 1;
   indices[index++] = 3;
   indices[index++] = 5;
-  indices[index++] = 1;
-  indices[index++] = 5;
+  indices[index++] = 4;
+  indices[index++] = 6;
+  indices[index++] = 8;
   indices[index++] = 7;
-  console.log(index);
-  console.log(numIndices);
-  console.log(positionIndex / 3);
-  console.log(vertexCount);
+  indices[index++] = 9;
+  indices[index++] = 11;
+  indices[index++] = 10;
+  indices[index++] = 12;
+  indices[index++] = 13;
+  indices[index++] = 14;
+  indices[index++] = 12;
+  indices[index++] = 14;
+  indices[index++] = 15;
+
+  // console.log(index);
+  // console.log(numIndices);
+
 
   var attributes = new GeometryAttributes();
   if (vertexFormat.position) {
@@ -377,12 +491,11 @@ RectangleSensorGeometry.createGeometry = function (rectangleSensorGeometry) {
     });
   }
 
-  var radiusScratch = new Cartesian2();
   radiusScratch.x = length;
   radiusScratch.y = Math.max(Math.max(left_length,right_length,front_length,back_length));
 
   var boundingSphere = new BoundingSphere(
-    new Cartesian3(0, 0, -length/2),
+    new Cartesian3(0, 0, 0),
     Cartesian2.magnitude(radiusScratch)
   );
 

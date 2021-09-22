@@ -195,8 +195,6 @@ RectangleSensorOutlineGeometry.createGeometry = function (rectangleSensorGeometr
   var indices  = IndexDatatype.createTypedArray(vertexCount, numIndices);
   var positions = new Float64Array(vertexCount * 3);
 
-  let height_over_two = length / 2;
-  let height_three_over_two = 3 * height_over_two;
   let front_length = length * Math.sin(frontHalfAngle);
   let back_length = length * Math.sin(backHalfAngle);
   let left_length = length * Math.sin(leftHalfAngle);
@@ -204,43 +202,43 @@ RectangleSensorOutlineGeometry.createGeometry = function (rectangleSensorGeometr
   // 顶点 0
   positions[positionIndex++] = 0;
   positions[positionIndex++] = 0;
-  positions[positionIndex++] = -height_over_two;
+  positions[positionIndex++] = 0;
   // 左上 1
   positions[positionIndex++] = -left_length;
   positions[positionIndex++] = front_length;
-  positions[positionIndex++] = -height_three_over_two;
+  positions[positionIndex++] = -length;
   // 中上点 2
   positions[positionIndex++] = 0;
   positions[positionIndex++] = front_length;
-  positions[positionIndex++] = -height_three_over_two;
+  positions[positionIndex++] = -length;
   // 右上 3
   positions[positionIndex++] = right_length;
   positions[positionIndex++] = front_length;
-  positions[positionIndex++] = -height_three_over_two;
+  positions[positionIndex++] = -length;
   // 右中点 4
   positions[positionIndex++] = right_length;
   positions[positionIndex++] = 0;
-  positions[positionIndex++] = -height_three_over_two;
+  positions[positionIndex++] = -length;
   // 右下 5
   positions[positionIndex++] = right_length;
   positions[positionIndex++] = -back_length;
-  positions[positionIndex++] = -height_three_over_two;
+  positions[positionIndex++] = -length;
   // 中下点 6
   positions[positionIndex++] = 0;
   positions[positionIndex++] = -back_length;
-  positions[positionIndex++] = -height_three_over_two;
+  positions[positionIndex++] = -length;
   // 左下 7
   positions[positionIndex++] = -left_length;
   positions[positionIndex++] = -back_length;
-  positions[positionIndex++] = -height_three_over_two;
+  positions[positionIndex++] = -length;
   // 左中点 8
   positions[positionIndex++] = -left_length;
   positions[positionIndex++] = 0;
-  positions[positionIndex++] = -height_three_over_two;
+  positions[positionIndex++] = -length;
   // 底面中心 9
   positions[positionIndex++] = 0;
   positions[positionIndex++] = 0;
-  positions[positionIndex++] = -height_three_over_two;
+  positions[positionIndex++] = -length;
 
   // line
   indices[index++] = 0;
@@ -272,10 +270,8 @@ RectangleSensorOutlineGeometry.createGeometry = function (rectangleSensorGeometr
   indices[index++] = 4;
   indices[index++] = 8;
 
-  console.log(index);
-  console.log(numIndices);
-  console.log(positionIndex / 3);
-  console.log(vertexCount);
+  // console.log(index);
+  // console.log(numIndices);
 
   var attributes = new GeometryAttributes();
   attributes.position = new GeometryAttribute({
@@ -289,7 +285,7 @@ RectangleSensorOutlineGeometry.createGeometry = function (rectangleSensorGeometr
   radiusScratch.y = Math.max(Math.max(left_length,right_length,front_length,back_length));
 
   var boundingSphere = new BoundingSphere(
-    new Cartesian3(0, 0, -length/2),
+    new Cartesian3(0, 0, 0),
     Cartesian2.magnitude(radiusScratch)
   );
 

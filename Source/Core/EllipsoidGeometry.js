@@ -248,28 +248,20 @@ EllipsoidGeometry.createGeometry = function (ellipsoidGeometry) {
 
   // Add an extra slice and stack so that the number of partitions is the
   // number of surfaces rather than the number of joints
-  // 整个球体时钟向切割面数量
   var slicePartitions = ellipsoidGeometry._slicePartitions + 1;
-  // 整个球体纵向切割面数
   var stackPartitions = ellipsoidGeometry._stackPartitions + 1;
 
-  // 计算相对于整个球体实际时向切割面片数量
   slicePartitions = Math.round(
     (slicePartitions * Math.abs(maximumClock - minimumClock)) /
       CesiumMath.TWO_PI
   );
-
-  // 计算相对于整个球体实纵向切割面片数量
   stackPartitions = Math.round(
     (stackPartitions * Math.abs(maximumCone - minimumCone)) / CesiumMath.PI
   );
 
-  // 最小时向切面数量为2
   if (slicePartitions < 2) {
     slicePartitions = 2;
   }
-
-  // 最小纵向切面数量为2
   if (stackPartitions < 2) {
     stackPartitions = 2;
   }
@@ -280,49 +272,43 @@ EllipsoidGeometry.createGeometry = function (ellipsoidGeometry) {
 
   // Create arrays for theta and phi. Duplicate first and last angle to
   // allow different normals at the intersections.
-  var phis = [minimumCone]; // 纬度划分角度
-  var thetas = [minimumClock]; // 经度划分角度
-  // 计算每个纵向面片开始的弧度
+  var phis = [minimumCone];
+  var thetas = [minimumClock];
   for (i = 0; i < stackPartitions; i++) {
     phis.push(
       minimumCone + (i * (maximumCone - minimumCone)) / (stackPartitions - 1)
     );
   }
   phis.push(maximumCone);
-  // 计算每时向个面片开始的弧度
   for (j = 0; j < slicePartitions; j++) {
     thetas.push(
       minimumClock + (j * (maximumClock - minimumClock)) / (slicePartitions - 1)
     );
   }
   thetas.push(maximumClock);
-  // 纵向面片数量+2
   var numPhis = phis.length;
-  // 时向面片数量+2
   var numThetas = thetas.length;
 
   // Allow for extra indices if there is an inner surface and if we need
   // to close the sides if the clock range is not a full circle
-  var extraIndices = 0; // 额外的三角面片索引
-  var vertexMultiplier = 1.0; // 顶点系数
-  // 判断是否有内面，必须radii和innerRadii完全相等时才无内表面
+  var extraIndices = 0;
+  var vertexMultiplier = 1.0;
   var hasInnerSurface =
     innerRadii.x !== radii.x ||
     innerRadii.y !== radii.y ||
     innerRadii.z !== radii.z;
-  var isTopOpen = false; // 是否上部打开
-  var isBotOpen = false; // 是否下部打开
-  var isClockOpen = false; // 是否时钟不封闭
-
+  var isTopOpen = false;
+  var isBotOpen = false;
+  var isClockOpen = false;
   if (hasInnerSurface) {
-    vertexMultiplier = 2.0;// 当有内表面时，内表面和外表面具备两倍的顶点数量
+    vertexMultiplier = 2.0;
     if (minimumCone > 0.0) {
       isTopOpen = true;
-      extraIndices += slicePartitions - 1; // 如果top打开，额外增加 slicePartitions - 1面片
+      extraIndices += slicePartitions - 1;
     }
     if (maximumCone < Math.PI) {
       isBotOpen = true;
-      extraIndices += slicePartitions - 1;  // 如果bot打开，额外增加 slicePartitions - 1面片
+      extraIndices += slicePartitions - 1;
     }
     if ((maximumClock - minimumClock) % CesiumMath.TWO_PI) {
       isClockOpen = true;
@@ -337,16 +323,14 @@ EllipsoidGeometry.createGeometry = function (ellipsoidGeometry) {
   var isInner = arrayFill(new Array(vertexCount), false);
   var negateNormal = arrayFill(new Array(vertexCount), false);
 
-  // 这里计算顶点数量
-  var indexCount = slicePartitions * stackPartitions * vertexMultiplier;
   // Multiply by 6 because there are two triangles per sector
+  var indexCount = slicePartitions * stackPartitions * vertexMultiplier;
   var numIndices =
     6 *
     (indexCount +
       extraIndices +
       1 -
       (slicePartitions + stackPartitions) * vertexMultiplier);
-  // 根据顶点数量确定面片数组使用的数据类型，这里只有Uint16和Uint32
   var indices = IndexDatatype.createTypedArray(indexCount, numIndices);
 
   var normals = vertexFormat.normal

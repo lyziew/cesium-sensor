@@ -1419,7 +1419,6 @@ function loadSynchronous(primitive, frameState) {
   }
 }
 
-// 重新计算
 function recomputeBoundingSpheres(primitive, frameState) {
   var offsetIndex = primitive._batchTableAttributeIndices.offset;
   if (!primitive._recomputeBoundingSpheres || !defined(offsetIndex)) {
@@ -1493,7 +1492,6 @@ function recomputeBoundingSpheres(primitive, frameState) {
     result.push(resultBS3);
   }
 
-  // 这里是映射2D的关键么
   for (i = 0; i < result.length; i++) {
     var boundingSphere = result[i].clone(primitive._boundingSpheres[i]);
     primitive._boundingSpheres[i] = boundingSphere;
@@ -2136,9 +2134,7 @@ Primitive.prototype.update = function (frameState) {
       Array.isArray(this.geometryInstances) &&
       this.geometryInstances.length === 0) ||
     !defined(this.appearance) ||
-    // 悖论
     (frameState.mode !== SceneMode.SCENE3D && frameState.scene3DOnly) ||
-    // 不渲染
     (!frameState.passes.render && !frameState.passes.pick)
   ) {
     return;

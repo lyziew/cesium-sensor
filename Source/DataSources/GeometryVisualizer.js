@@ -24,6 +24,7 @@ import PlaneGeometryUpdater from "./PlaneGeometryUpdater.js";
 import PolygonGeometryUpdater from "./PolygonGeometryUpdater.js";
 import PolylineVolumeGeometryUpdater from "./PolylineVolumeGeometryUpdater.js";
 import RectangleGeometryUpdater from "./RectangleGeometryUpdater.js";
+import RectangleSensorGeometryUpdater from "./RectangleSensorGeometryUpdater.js";
 import StaticGeometryColorBatch from "./StaticGeometryColorBatch.js";
 import StaticGeometryPerMaterialBatch from "./StaticGeometryPerMaterialBatch.js";
 import StaticGroundGeometryColorBatch from "./StaticGroundGeometryColorBatch.js";
@@ -44,6 +45,7 @@ var geometryUpdaters = [
     PolygonGeometryUpdater,
     PolylineVolumeGeometryUpdater,
     RectangleGeometryUpdater,
+    RectangleSensorGeometryUpdater,
     WallGeometryUpdater,
 ];
 
