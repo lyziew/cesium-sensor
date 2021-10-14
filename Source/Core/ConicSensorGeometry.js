@@ -652,9 +652,6 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
     indices[index++] = oed;
   }
 
-  // console.log(index);
-  // console.log(numIndices);
-
   let attributes = new GeometryAttributes();
   if (vertexFormat.position) {
     attributes.position = new GeometryAttribute({
@@ -719,8 +716,6 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
       values: applyOffset,
     });
   }
-
-  console.log(attributes);
 
   return new Geometry({
     attributes: attributes,

@@ -379,9 +379,6 @@ ConicSensorOutlineGeometry.createGeometry = function (conicSensorGeometry) {
     indices[index++] = b;
   }
 
-  // console.log(index);
-  // console.log(numIndices);
-
   let attributes = new GeometryAttributes();
   attributes.position = new GeometryAttribute({
     componentDatatype: ComponentDatatype.DOUBLE,

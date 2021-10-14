@@ -446,10 +446,6 @@ RectangleSensorGeometry.createGeometry = function (rectangleSensorGeometry) {
   indices[index++] = 14;
   indices[index++] = 15;
 
-  // console.log(index);
-  // console.log(numIndices);
-
-
   var attributes = new GeometryAttributes();
   if (vertexFormat.position) {
     attributes.position = new GeometryAttribute({

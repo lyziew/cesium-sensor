@@ -270,9 +270,6 @@ RectangleSensorOutlineGeometry.createGeometry = function (rectangleSensorGeometr
   indices[index++] = 4;
   indices[index++] = 8;
 
-  // console.log(index);
-  // console.log(numIndices);
-
   var attributes = new GeometryAttributes();
   attributes.position = new GeometryAttribute({
     componentDatatype: ComponentDatatype.DOUBLE,

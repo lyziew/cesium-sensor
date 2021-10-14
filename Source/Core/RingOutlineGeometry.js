@@ -237,9 +237,6 @@ RingOutlineGeometry.createGeometry = function(ringGeometry) {
     }
   }
 
-  console.log(index)
-  console.log(numIndices);
-
   var attributes = new GeometryAttributes();
   attributes.position = new GeometryAttribute({
     componentDatatype : ComponentDatatype.DOUBLE,

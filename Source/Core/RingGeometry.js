@@ -320,9 +320,6 @@ RingGeometry.createGeometry = function(ringGeometry) {
     }
   }
 
-  console.log(index);
-  console.log(numIndices);
-
   var attributes = new GeometryAttributes();
   if (vertexFormat.position) {
     attributes.position = new GeometryAttribute({
