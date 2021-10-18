@@ -279,7 +279,11 @@ RectangleSensorOutlineGeometry.createGeometry = function (rectangleSensorGeometr
 
   var radiusScratch = new Cartesian2();
   radiusScratch.x = length;
-  radiusScratch.y = Math.max(Math.max(left_length,right_length,front_length,back_length));
+  var ll = left_length * left_length;
+  var ff = front_length * front_length;
+  var rr = right_length * right_length;
+  var bb = back_length * back_length;
+  radiusScratch.y = Math.max(Math.sqrt( ll + ff),Math.sqrt(ff + rr),Math.sqrt(rr + bb),Math.sqrt(bb + ll));
 
   var boundingSphere = new BoundingSphere(
     new Cartesian3(0, 0, 0),

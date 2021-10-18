@@ -85,6 +85,7 @@ import ReferenceProperty from "./ReferenceProperty.js";
 import Rotation from "./Rotation.js";
 import SampledPositionProperty from "./SampledPositionProperty.js";
 import SampledProperty from "./SampledProperty.js";
+import SarSensorGraphics from "./SarSensorGraphics.js";
 import StripeMaterialProperty from "./StripeMaterialProperty.js";
 import StripeOrientation from "./StripeOrientation.js";
 import TimeIntervalCollectionPositionProperty from "./TimeIntervalCollectionPositionProperty.js";
@@ -2667,7 +2668,7 @@ function processConicSensor(entity, packet, entityCollection, sourceUri) {
     Number,
     conicSensor,
     "topInnerRadius",
-    conicSensorData.topRadius,
+    conicSensorData.topInnerRadius,
     interval,
     sourceUri,
     entityCollection
@@ -2676,7 +2677,7 @@ function processConicSensor(entity, packet, entityCollection, sourceUri) {
     Number,
     conicSensor,
     "topOuterRadius",
-    conicSensorData.topRadius,
+    conicSensorData.topOuterRadius,
     interval,
     sourceUri,
     entityCollection
@@ -2685,7 +2686,7 @@ function processConicSensor(entity, packet, entityCollection, sourceUri) {
     Number,
     conicSensor,
     "bottomInnerRadius",
-    conicSensorData.bottomRadius,
+    conicSensorData.bottomInnerRadius,
     interval,
     sourceUri,
     entityCollection
@@ -2694,7 +2695,7 @@ function processConicSensor(entity, packet, entityCollection, sourceUri) {
     Number,
     conicSensor,
     "bottomOuterRadius",
-    conicSensorData.bottomRadius,
+    conicSensorData.bottomOuterRadius,
     interval,
     sourceUri,
     entityCollection
@@ -2703,7 +2704,7 @@ function processConicSensor(entity, packet, entityCollection, sourceUri) {
     Number,
     conicSensor,
     "thetaSegments",
-    conicSensorData.bottomRadius,
+    conicSensorData.thetaSegments,
     interval,
     sourceUri,
     entityCollection
@@ -2712,7 +2713,7 @@ function processConicSensor(entity, packet, entityCollection, sourceUri) {
     Number,
     conicSensor,
     "phiSegments",
-    conicSensorData.bottomRadius,
+    conicSensorData.phiSegments,
     interval,
     sourceUri,
     entityCollection
@@ -2721,7 +2722,7 @@ function processConicSensor(entity, packet, entityCollection, sourceUri) {
     Number,
     conicSensor,
     "thetaStart",
-    conicSensorData.bottomRadius,
+    conicSensorData.thetaStart,
     interval,
     sourceUri,
     entityCollection
@@ -2730,7 +2731,7 @@ function processConicSensor(entity, packet, entityCollection, sourceUri) {
     Number,
     conicSensor,
     "thetaLength",
-    conicSensorData.bottomRadius,
+    conicSensorData.thetaLength,
     interval,
     sourceUri,
     entityCollection
@@ -4695,8 +4696,8 @@ function processRectangleSensor(entity, packet, entityCollection, sourceUri) {
   processPacketData(
     Number,
     rectangleSensor,
-    "topInnerRadius",
-    rectangleSensorData.topRadius,
+    "leftHalfAngle",
+    rectangleSensorData.leftHalfAngle,
     interval,
     sourceUri,
     entityCollection
@@ -4704,8 +4705,8 @@ function processRectangleSensor(entity, packet, entityCollection, sourceUri) {
   processPacketData(
     Number,
     rectangleSensor,
-    "topOuterRadius",
-    rectangleSensorData.topRadius,
+    "rightHalfAngle",
+    rectangleSensorData.rightHalfAngle,
     interval,
     sourceUri,
     entityCollection
@@ -4713,8 +4714,8 @@ function processRectangleSensor(entity, packet, entityCollection, sourceUri) {
   processPacketData(
     Number,
     rectangleSensor,
-    "bottomInnerRadius",
-    rectangleSensorData.bottomRadius,
+    "frontHalfAngle",
+    rectangleSensorData.frontHalfAngle,
     interval,
     sourceUri,
     entityCollection
@@ -4722,44 +4723,8 @@ function processRectangleSensor(entity, packet, entityCollection, sourceUri) {
   processPacketData(
     Number,
     rectangleSensor,
-    "bottomOuterRadius",
-    rectangleSensorData.bottomRadius,
-    interval,
-    sourceUri,
-    entityCollection
-  );
-  processPacketData(
-    Number,
-    rectangleSensor,
-    "thetaSegments",
-    rectangleSensorData.bottomRadius,
-    interval,
-    sourceUri,
-    entityCollection
-  );
-  processPacketData(
-    Number,
-    rectangleSensor,
-    "phiSegments",
-    rectangleSensorData.bottomRadius,
-    interval,
-    sourceUri,
-    entityCollection
-  );
-  processPacketData(
-    Number,
-    rectangleSensor,
-    "thetaStart",
-    rectangleSensorData.bottomRadius,
-    interval,
-    sourceUri,
-    entityCollection
-  );
-  processPacketData(
-    Number,
-    rectangleSensor,
-    "thetaLength",
-    rectangleSensorData.bottomRadius,
+    "backHalfAngle",
+    rectangleSensorData.backHalfAngle,
     interval,
     sourceUri,
     entityCollection
@@ -4849,6 +4814,181 @@ function processRectangleSensor(entity, packet, entityCollection, sourceUri) {
     rectangleSensor,
     "distanceDisplayCondition",
     rectangleSensorData.distanceDisplayCondition,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+}
+
+function processSarSensor(entity, packet, entityCollection, sourceUri) {
+  var sarSensorData = packet.sarSensor;
+  if (!defined(sarSensorData)) {
+    return;
+  }
+
+  var interval = intervalFromString(sarSensorData.interval);
+  var sarSensor = entity.sarSensor;
+  if (!defined(sarSensor)) {
+    entity.sarSensor = sarSensor = new SarSensorGraphics();
+  }
+
+  processPacketData(
+    Boolean,
+    sarSensor,
+    "show",
+    sarSensorData.show,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    sarSensor,
+    "length",
+    sarSensorData.length,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    sarSensor,
+    "minLeftAngle",
+    sarSensorData.minLeftAngle,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    sarSensor,
+    "maxLeftAngle",
+    sarSensorData.maxLeftAngle,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    sarSensor,
+    "minRightAngle",
+    sarSensorData.minRightAngle,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    sarSensor,
+    "maxRightAngle",
+    sarSensorData.maxRightAngle,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    sarSensor,
+    "leftRange",
+    sarSensorData.leftRange,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    sarSensor,
+    "rightRange",
+    sarSensorData.rightRange,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    HeightReference,
+    sarSensor,
+    "heightReference",
+    sarSensorData.heightReference,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Boolean,
+    sarSensor,
+    "fill",
+    sarSensorData.fill,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processMaterialPacketData(
+    sarSensor,
+    "material",
+    sarSensorData.material,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Boolean,
+    sarSensor,
+    "outline",
+    sarSensorData.outline,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Color,
+    sarSensor,
+    "outlineColor",
+    sarSensorData.outlineColor,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    sarSensor,
+    "outlineWidth",
+    sarSensorData.outlineWidth,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    sarSensor,
+    "numberOfVerticalLines",
+    sarSensorData.numberOfVerticalLines,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    Number,
+    sarSensor,
+    "slices",
+    sarSensorData.slices,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    ShadowMode,
+    sarSensor,
+    "shadows",
+    sarSensorData.shadows,
+    interval,
+    sourceUri,
+    entityCollection
+  );
+  processPacketData(
+    DistanceDisplayCondition,
+    sarSensor,
+    "distanceDisplayCondition",
+    sarSensorData.distanceDisplayCondition,
     interval,
     sourceUri,
     entityCollection
@@ -5398,6 +5538,7 @@ CzmlDataSource.updaters = [
   processRectangle, //
   processRectangleSensor, //
   processPosition, //
+  processSarSensor, //
   processTileset, //
   processViewFrom, //
   processWall, //

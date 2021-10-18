@@ -12,11 +12,10 @@ import createPropertyDescriptor from "./createPropertyDescriptor.js";
  *
  * @property {Property | boolean} [show=true] A boolean Property specifying the visibility of the rectangleSensor.
  * @property {Property | number} [length] A numeric Property specifying the length of the rectangleSensor.
- * @property {Property | number} [leftHalfAngle] A numeric Property specifying the radius of the top of the rectangleSensor.
- * @property {Property | number} [rightHalfAngle] A numeric Property specifying the radius of the top of the rectangleSensor.
- * @property {Property | number} [frontHalfAngle] A numeric Property specifying the radius of the bottom of the rectangleSensor.
- * @property {Property | number} [backHalfAngle] A numeric Property specifying the radius of the bottom of the rectangleSensor.
- * @property {Property | number} [offsetAttribute] A numeric Property specifying the radius of the bottom of the rectangleSensor.
+ * @property {Property | number} [leftHalfAngle] A numeric Property specifying the left half angle of the rectangleSensor.
+ * @property {Property | number} [rightHalfAngle] A numeric Property specifying the right half angle of the rectangleSensor.
+ * @property {Property | number} [frontHalfAngle] A numeric Property specifying the front half angle of the rectangleSensor.
+ * @property {Property | number} [backHalfAngle] A numeric Property specifying the back half angle of the rectangleSensor.
  * @property {Property | HeightReference} [heightReference=HeightReference.NONE] A Property specifying what the height from the entity position is relative to.
  * @property {Property | boolean} [fill=true] A boolean Property specifying whether the rectangleSensor is filled with the provided material.
  * @property {MaterialProperty | Color} [material=Color.WHITE] A Property specifying the material used to fill the rectangleSensor.

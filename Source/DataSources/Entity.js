@@ -37,6 +37,7 @@ import Property from "./Property.js";
 import PropertyBag from "./PropertyBag.js";
 import RectangleGraphics from "./RectangleGraphics.js";
 import RectangleSensorGraphics from "./RectangleSensorGraphics";
+import SarSensorGraphics from "./SarSensorGraphics";
 import WallGraphics from "./WallGraphics.js";
 
 var cartoScratch = new Cartographic();
@@ -95,6 +96,7 @@ function createPropertyTypeDescriptor(name, Type) {
  * @property {PolylineVolumeGraphics | PolylineVolumeGraphics.ConstructorOptions} [polylineVolume] A polylineVolume to associate with this entity.
  * @property {RectangleGraphics | RectangleGraphics.ConstructorOptions} [rectangle] A rectangle to associate with this entity.
  * @property {RectangleSensorGraphics | RectangleSensorGraphics.ConstructorOptions} [rectangleSensor] A rectangleSensor to associate with this entity.
+ * @property {SarSensorGraphics | SarSensorGraphics.ConstructorOptions} [sarSensor] A sarSensor to associate with this entity.
  * @property {WallGraphics | WallGraphics.ConstructorOptions} [wall] A wall to associate with this entity.
  */
 
@@ -146,6 +148,7 @@ function Entity(options) {
     "properties",
     "rectangle",
     "rectangleSensor",
+    "sarSensor",
     "viewFrom",
     "wall",
   ];
@@ -194,6 +197,8 @@ function Entity(options) {
   this._rectangleSubscription = undefined;
   this._rectangleSensor = undefined;
   this._rectangleSensorSubscription = undefined;
+  this._sarSensor = undefined;
+  this._sarSensorSubscription = undefined;
   this._viewFrom = undefined;
   this._viewFromSubscription = undefined;
   this._wall = undefined;
@@ -497,6 +502,12 @@ Object.defineProperties(Entity.prototype, {
    * @type {RectangleSensorGraphics|undefined}
    */
   rectangleSensor: createPropertyTypeDescriptor("rectangleSensor", RectangleSensorGraphics),
+  /**
+   * Gets or sets the sarSensor.
+   * @memberof Entity.prototype
+   * @type {SarSensorGraphics|undefined}
+   */
+  sarSensor: createPropertyTypeDescriptor("sarSensor", SarSensorGraphics),
   /**
    * Gets or sets the suggested initial offset when tracking this object.
    * The offset is typically defined in the east-north-up reference frame,

@@ -12,15 +12,14 @@ import createPropertyDescriptor from "./createPropertyDescriptor.js";
  *
  * @property {Property | boolean} [show=true] A boolean Property specifying the visibility of the conicSensor.
  * @property {Property | number} [length] A numeric Property specifying the length of the conicSensor.
- * @property {Property | number} [topInnerRadius] A numeric Property specifying the radius of the top of the conicSensor.
- * @property {Property | number} [topOuterRadius] A numeric Property specifying the radius of the top of the conicSensor.
- * @property {Property | number} [bottomInnerRadius] A numeric Property specifying the radius of the bottom of the conicSensor.
- * @property {Property | number} [bottomOuterRadius] A numeric Property specifying the radius of the bottom of the conicSensor.
- * @property {Property | number} [thetaSegments] A numeric Property specifying the radius of the bottom of the conicSensor.
- * @property {Property | number} [phiSegments] A numeric Property specifying the radius of the bottom of the conicSensor.
- * @property {Property | number} [thetaStart] A numeric Property specifying the radius of the bottom of the conicSensor.
- * @property {Property | number} [thetaLength] A numeric Property specifying the radius of the bottom of the conicSensor.
- * @property {Property | number} [offsetAttribute] A numeric Property specifying the radius of the bottom of the conicSensor.
+ * @property {Property | number} [topInnerRadius] A numeric Property specifying the inner radius of the top of the conicSensor.
+ * @property {Property | number} [topOuterRadius] A numeric Property specifying the outer radius of the top of the conicSensor.
+ * @property {Property | number} [bottomInnerRadius] A numeric Property specifying the inner radius of the bottom of the conicSensor.
+ * @property {Property | number} [bottomOuterRadius] A numeric Property specifying the outer radius of the bottom of the conicSensor.
+ * @property {Property | number} [thetaSegments] A numeric Property specifying the theta segments of the conicSensor.
+ * @property {Property | number} [phiSegments] A numeric Property specifying the phi segments of the conicSensor.
+ * @property {Property | number} [thetaStart] A numeric Property specifying the theta start of the conicSensor.
+ * @property {Property | number} [thetaLength] A numeric Property specifying the theta length of the conicSensor.
  * @property {Property | HeightReference} [heightReference=HeightReference.NONE] A Property specifying what the height from the entity position is relative to.
  * @property {Property | boolean} [fill=true] A boolean Property specifying whether the conicSensor is filled with the provided material.
  * @property {MaterialProperty | Color} [material=Color.WHITE] A Property specifying the material used to fill the conicSensor.

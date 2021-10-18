@@ -28,8 +28,10 @@ var positionScratch = new Cartesian3();
  *
  * @param {Object} options Object with the following properties:
  * @param {Number} options.length The length of the rectangleSensor.
- * @param {Number} options.topRadius The radius of the top of the rectangleSensor.
- * @param {Number} options.bottomRadius The radius of the bottom of the rectangleSensor.
+ * @param {Number} options.leftHalfAngle The left half angle of the rectangleSensor.
+ * @param {Number} options.rightHalfAngle The right half angle of the rectangleSensor.
+ * @param {Number} options.frontHalfAngle The front half angle of the rectangleSensor.
+ * @param {Number} options.backHalfAngle The back half angle of the rectangleSensor
  * @param {Number} [options.slices=128] The number of edges around the perimeter of the rectangleSensor.
  * @param {VertexFormat} [options.vertexFormat=VertexFormat.DEFAULT] The vertex attributes to be computed.
  *
@@ -236,8 +238,6 @@ RectangleSensorGeometry.createGeometry = function (rectangleSensorGeometry) {
   let back_length = length * Math.sin(backHalfAngle);
   let left_length = length * Math.sin(leftHalfAngle);
   let right_length = length * Math.sin(rightHalfAngle);
-  let x_length = left_length + right_length;
-  let y_length = front_length + back_length;
   // 前面
   positions[positionIndex++] = 0;
   positions[positionIndex++] = 0;
@@ -307,6 +307,11 @@ RectangleSensorGeometry.createGeometry = function (rectangleSensorGeometry) {
       var bitangent = bitangentScratch;
       var normalScale = 0.0;
 
+      normal.z = Math.sin(angles[i]);
+      normalScale = Math.cos(angles[i]);
+      normal.x = normalScale * Math.cos(0.25 * i * CesiumMath.TWO_PI);
+      normal.y = normalScale * Math.sin(0.25 * i * CesiumMath.TWO_PI);
+
       if (computeTangent) {
         tangent = Cartesian3.normalize(
           Cartesian3.cross(Cartesian3.UNIT_Z, normal, tangent),
@@ -316,10 +321,6 @@ RectangleSensorGeometry.createGeometry = function (rectangleSensorGeometry) {
 
       // normal
       if (vertexFormat.normal) {
-        normal.z = Math.sin(angles[i]);
-        normalScale = Math.cos(angles[i]);
-        normal.x = normalScale * Math.cos(0.25 * i * CesiumMath.TWO_PI);
-        normal.y = normalScale * Math.sin(0.25 * i * CesiumMath.TWO_PI);
         normals[normalIndex++] = normal.x;
         normals[normalIndex++] = normal.y;
         normals[normalIndex++] = normal.z;
@@ -412,8 +413,8 @@ RectangleSensorGeometry.createGeometry = function (rectangleSensorGeometry) {
   if (vertexFormat.st) {
     for (i = 0; i < 3 * 4; i++) {
       var position = Cartesian3.fromArray(positions, i * 3, positionScratch);
-      st[stIndex++] = (position.x + leftHalfAngle) / (leftHalfAngle + rightHalfAngle);
-      st[stIndex++] = (position.y + backHalfAngle) / (frontHalfAngle + backHalfAngle);
+      st[stIndex++] = (position.x + left_length) / (left_length + right_length);
+      st[stIndex++] = (position.y + back_length) / (back_length + front_length);
     }
 
     st[stIndex++] = 0.0;
@@ -488,7 +489,11 @@ RectangleSensorGeometry.createGeometry = function (rectangleSensorGeometry) {
   }
 
   radiusScratch.x = length;
-  radiusScratch.y = Math.max(Math.max(left_length,right_length,front_length,back_length));
+  var ll = left_length * left_length;
+  var ff = front_length * front_length;
+  var rr = right_length * right_length;
+  var bb = back_length * back_length;
+  radiusScratch.y = Math.max(Math.sqrt( ll + ff),Math.sqrt(ff + rr),Math.sqrt(rr + bb),Math.sqrt(bb + ll));
 
   var boundingSphere = new BoundingSphere(
     new Cartesian3(0, 0, 0),
