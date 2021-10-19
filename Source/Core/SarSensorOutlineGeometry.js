@@ -15,7 +15,7 @@ import CesiumMath from "./Math.js";
 import PrimitiveType from "./PrimitiveType.js";
 
 /**
- * A description of the outline of a rarSensor.
+ * A description of the outline of a sarSensor.
  *
  * @alias SarSensorOutlineGeometry
  * @constructor
@@ -26,31 +26,40 @@ import PrimitiveType from "./PrimitiveType.js";
  * @param {Number} options.maxLeftAngle The max left angle of the the sarSensor.
  * @param {Number} options.minRightAngle The min right angle of the sarSensor.
  * @param {Number} options.maxRightAngle The max right angle of the sarSensor.
- * @param {Number} options.leftRange The left range of the sarSensor.
- * @param {Number} options.rightRange The right range of the sarSensor.
+ * @param {Number} options.leftWidth The left range of the sarSensor.
+ * @param {Number} options.rightWidth The right range of the sarSensor.
  *
  * @exception {DeveloperError} options.length must be greater than 0.
  *
  * @see SarSensorOutlineGeometry.createGeometry
  *
  * @example
- * // create rarSensor geometry
- * var rarSensor = new Cesium.SarSensorOutlineGeometry({
+ * // create sarSensor geometry
+ * var sarSensor = new Cesium.SarSensorOutlineGeometry({
  *     length: 200000,
- *     leftRange: 2000,
- *     rightRange: 2000,
+ *     leftWidth: 2000,
+ *     rightWidth: 2000,
  * });
- * var geometry = Cesium.SarSensorOutlineGeometry.createGeometry(rarSensor);
+ * var geometry = Cesium.SarSensorOutlineGeometry.createGeometry(sarSensor);
  */
 function SarSensorOutlineGeometry(options) {
   options = defaultValue(options, defaultValue.EMPTY_OBJECT);
   var length = options.length;
   var minLeftAngle = defaultValue(options.minLeftAngle, CesiumMath.PI_OVER_SIX);
-  var maxLeftAngle = defaultValue(options.maxLeftAngle, CesiumMath.PI_OVER_FOUR);
-  var minRightAngle = defaultValue(options.minRightAngle, CesiumMath.PI_OVER_SIX);
-  var maxRightAngle = defaultValue(options.maxRightAngle, CesiumMath.PI_OVER_FOUR);
-  var leftRange = defaultValue(options.leftRange, 0); // 幅宽 0米
-  var rightRange = defaultValue(options.rightRange, 0); // 幅宽 0米
+  var maxLeftAngle = defaultValue(
+    options.maxLeftAngle,
+    CesiumMath.PI_OVER_FOUR
+  );
+  var minRightAngle = defaultValue(
+    options.minRightAngle,
+    CesiumMath.PI_OVER_SIX
+  );
+  var maxRightAngle = defaultValue(
+    options.maxRightAngle,
+    CesiumMath.PI_OVER_FOUR
+  );
+  var leftWidth = defaultValue(options.leftWidth, 1000); // 幅宽 0米
+  var rightWidth = defaultValue(options.rightWidth, 1000); // 幅宽 0米
   //>>includeStart('debug', pragmas.debug);
   if (!defined(length)) {
     throw new DeveloperError("options.length must be defined.");
@@ -71,10 +80,10 @@ function SarSensorOutlineGeometry(options) {
   this._maxLeftAngle = maxLeftAngle;
   this._minRightAngle = minRightAngle;
   this._maxRightAngle = maxRightAngle;
-  this._leftRange = leftRange;
-  this._rightRange = rightRange;
+  this._leftWidth = leftWidth;
+  this._rightWidth = rightWidth;
   this._offsetAttribute = options.offsetAttribute;
-  this._workerName = "createRarSensorOutlineGeometry";
+  this._workerName = "createSarSensorOutlineGeometry";
 }
 
 /**
@@ -108,8 +117,8 @@ SarSensorOutlineGeometry.pack = function (value, array, startingIndex) {
   array[startingIndex++] = value._maxLeftAngle;
   array[startingIndex++] = value._minRightAngle;
   array[startingIndex++] = value._maxRightAngle;
-  array[startingIndex++] = value._leftRange;
-  array[startingIndex++] = value._rightRange;
+  array[startingIndex++] = value._leftWidth;
+  array[startingIndex++] = value._rightWidth;
   array[startingIndex] = defaultValue(value._offsetAttribute, -1);
 
   return array;
@@ -117,13 +126,13 @@ SarSensorOutlineGeometry.pack = function (value, array, startingIndex) {
 
 var scratchOptions = {
   length: undefined,
-  minLeftAngle : undefined,
-  maxLeftAngle : undefined,
-  minRightAngle : undefined,
-  maxRightAngle : undefined,
-  leftRange : undefined,
-  rightRange : undefined,
-  offsetAttribute : undefined,
+  minLeftAngle: undefined,
+  maxLeftAngle: undefined,
+  minRightAngle: undefined,
+  maxRightAngle: undefined,
+  leftWidth: undefined,
+  rightWidth: undefined,
+  offsetAttribute: undefined,
 };
 /**
  * Retrieves an instance from a packed array.
@@ -145,8 +154,8 @@ SarSensorOutlineGeometry.unpack = function (array, startingIndex, result) {
   var maxLeftAngle = array[startingIndex++];
   var minRightAngle = array[startingIndex++];
   var maxRightAngle = array[startingIndex++];
-  var leftRange = array[startingIndex++];
-  var rightRange = array[startingIndex++];
+  var leftWidth = array[startingIndex++];
+  var rightWidth = array[startingIndex++];
   var offsetAttribute = array[startingIndex];
 
   if (!defined(result)) {
@@ -155,8 +164,8 @@ SarSensorOutlineGeometry.unpack = function (array, startingIndex, result) {
     scratchOptions.maxLeftAngle = maxLeftAngle;
     scratchOptions.minRightAngle = minRightAngle;
     scratchOptions.maxRightAngle = maxRightAngle;
-    scratchOptions.leftRange = leftRange;
-    scratchOptions.rightRange = rightRange;
+    scratchOptions.leftWidth = leftWidth;
+    scratchOptions.rightWidth = rightWidth;
     scratchOptions.offsetAttribute =
       offsetAttribute === -1 ? undefined : offsetAttribute;
     return new SarSensorOutlineGeometry(scratchOptions);
@@ -167,43 +176,41 @@ SarSensorOutlineGeometry.unpack = function (array, startingIndex, result) {
   result._maxLeftAngle = maxLeftAngle;
   result._minRightAngle = minRightAngle;
   result._maxRightAngle = maxRightAngle;
-  result._leftRange = leftRange;
-  result._rightRange = rightRange;
+  result._leftWidth = leftWidth;
+  result._rightWidth = rightWidth;
   result._offsetAttribute =
     offsetAttribute === -1 ? undefined : offsetAttribute;
   return result;
 };
 
 /**
- * Computes the geometric representation of an outline of a rarSensor, including its vertices, indices, and a bounding sphere.
+ * Computes the geometric representation of an outline of a sarSensor, including its vertices, indices, and a bounding sphere.
  *
- * @param {SarSensorOutlineGeometry} SarSensorOutlineGeometry A description of the rarSensor outline.
+ * @param {SarSensorOutlineGeometry} SarSensorOutlineGeometry A description of the sarSensor outline.
  * @returns {Geometry|undefined} The computed vertices and indices.
  */
-SarSensorOutlineGeometry.createGeometry = function (rarSensorGeometry) {
-  var length = rarSensorGeometry._length;
-  let minLeftAngle = sarSensorGeometry._minLeftAngle;
-  let maxLeftAngle = sarSensorGeometry._maxLeftAngle;
-  let minRightAngle = sarSensorGeometry._minRightAngle;
-  let maxRightAngle = sarSensorGeometry._maxRightAngle;
-  let leftRange = sarSensorGeometry._leftRange;
-  let rightRange = sarSensorGeometry._rightRange;
+SarSensorOutlineGeometry.createGeometry = function (sarSensorGeometry) {
+  var length = sarSensorGeometry._length;
+  var minLeftAngle = sarSensorGeometry._minLeftAngle;
+  var maxLeftAngle = sarSensorGeometry._maxLeftAngle;
+  var minRightAngle = sarSensorGeometry._minRightAngle;
+  var maxRightAngle = sarSensorGeometry._maxRightAngle;
+  var leftWidth = sarSensorGeometry._leftWidth;
+  var rightWidth = sarSensorGeometry._rightWidth;
 
-  if (
-    length <= 0
-  ) {
+  if (length <= 0) {
     return;
   }
 
-  if(leftRange < 0) {
-    leftRange = 0;
+  if (leftWidth < 0) {
+    leftWidth = 0;
   }
 
-  if(rightRange < 0) {
-    rightRange = 0;
+  if (rightWidth < 0) {
+    rightWidth = 0;
   }
 
-  if(leftRange===0 && rightRange ===0) {
+  if (leftWidth === 0 && rightWidth === 0) {
     return;
   }
 
@@ -215,21 +222,21 @@ SarSensorOutlineGeometry.createGeometry = function (rarSensorGeometry) {
   // 上下面 + 内外面 + 2个截面
   var numIndices = 32;
 
-  if(leftRange === 0 || rightRange === 0) {
+  if (leftWidth === 0 || rightWidth === 0) {
     vertexCount = 5;
     numIndices = 16;
   }
-  var indices  = IndexDatatype.createTypedArray(vertexCount, numIndices);
+  var indices = IndexDatatype.createTypedArray(vertexCount, numIndices);
   var positions = new Float64Array(vertexCount * 3);
 
-  let min_left_length = length * Math.sin(minLeftAngle);
-  let max_left_length = length * Math.sin(maxLeftAngle);
-  let min_right_length = length * Math.sin(minRightAngle);
-  let max_right_length = length * Math.sin(maxRightAngle);
-  let half_left_range = leftRange / 2;
-  let half_right_range = rightRange / 2;
+  var min_left_length = length * Math.sin(minLeftAngle);
+  var max_left_length = length * Math.sin(maxLeftAngle);
+  var min_right_length = length * Math.sin(minRightAngle);
+  var max_right_length = length * Math.sin(maxRightAngle);
+  var half_left_range = leftWidth / 2;
+  var half_right_range = rightWidth / 2;
 
-  if(leftRange > 0) {
+  if (leftWidth > 0) {
     // 顶点 0
     positions[positionIndex++] = 0;
     positions[positionIndex++] = 0;
@@ -273,9 +280,9 @@ SarSensorOutlineGeometry.createGeometry = function (rarSensorGeometry) {
     indices[index++] = 1;
   }
 
-  let rightStartPositionIndex = Math.floor(positionIndex / 3);
+  var rightStartPositionIndex = Math.floor(positionIndex / 3);
 
-  if(rightRange > 0) {
+  if (rightWidth > 0) {
     // 顶点 0
     positions[positionIndex++] = 0;
     positions[positionIndex++] = 0;
@@ -328,20 +335,24 @@ SarSensorOutlineGeometry.createGeometry = function (rarSensorGeometry) {
 
   var radiusScratch = new Cartesian2();
   radiusScratch.x = length;
-  radiusScratch.y = Math.max(Math.max(left_length,right_length,front_length,back_length));
+  var ll =
+    max_left_length * max_left_length + half_left_range * half_left_range;
+  var rr =
+    max_right_length * max_right_length + half_right_range * half_right_range;
+  radiusScratch.y = Math.max(Math.sqrt(ll), Math.sqrt(rr));
 
   var boundingSphere = new BoundingSphere(
     new Cartesian3(0, 0, 0),
     Cartesian2.magnitude(radiusScratch)
   );
 
-  if (defined(rarSensorGeometry._offsetAttribute)) {
+  if (defined(sarSensorGeometry._offsetAttribute)) {
     length = positions.length;
     var applyOffset = new Uint8Array(length / 3);
     var offsetValue =
-      rarSensorGeometry._offsetAttribute === GeometryOffsetAttribute.NONE
-      ? 0
-      : 1;
+      sarSensorGeometry._offsetAttribute === GeometryOffsetAttribute.NONE
+        ? 0
+        : 1;
     arrayFill(applyOffset, offsetValue);
     attributes.applyOffset = new GeometryAttribute({
       componentDatatype: ComponentDatatype.UNSIGNED_BYTE,
@@ -355,7 +366,7 @@ SarSensorOutlineGeometry.createGeometry = function (rarSensorGeometry) {
     indices: indices,
     primitiveType: PrimitiveType.LINES,
     boundingSphere: boundingSphere,
-    offsetAttribute: rarSensorGeometry._offsetAttribute,
+    offsetAttribute: sarSensorGeometry._offsetAttribute,
   });
 };
 export default SarSensorOutlineGeometry;

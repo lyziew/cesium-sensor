@@ -4889,8 +4889,8 @@ function processSarSensor(entity, packet, entityCollection, sourceUri) {
   processPacketData(
     Number,
     sarSensor,
-    "leftRange",
-    sarSensorData.leftRange,
+    "leftWidth",
+    sarSensorData.leftWidth,
     interval,
     sourceUri,
     entityCollection
@@ -4898,8 +4898,8 @@ function processSarSensor(entity, packet, entityCollection, sourceUri) {
   processPacketData(
     Number,
     sarSensor,
-    "rightRange",
-    sarSensorData.rightRange,
+    "rightWidth",
+    sarSensorData.rightWidth,
     interval,
     sourceUri,
     entityCollection

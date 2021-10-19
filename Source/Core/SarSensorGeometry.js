@@ -23,7 +23,7 @@ var positionScratch = new Cartesian3();
 /**
  * A description of a sarSensor.
  *
- * @alias RarSensorGeometry
+ * @alias SarSensorGeometry
  * @constructor
  *
  * @param {Object} options Object with the following properties:
@@ -32,32 +32,41 @@ var positionScratch = new Cartesian3();
  * @param {Number} options.maxLeftAngle The max left angle of the the sarSensor.
  * @param {Number} options.minRightAngle The min right angle of the sarSensor.
  * @param {Number} options.maxRightAngle The max right angle of the sarSensor.
- * @param {Number} options.leftRange The left range of the sarSensor.
- * @param {Number} options.rightRange The right range of the sarSensor.
+ * @param {Number} options.leftWidth The left range of the sarSensor.
+ * @param {Number} options.rightWidth The right range of the sarSensor.
  * @param {VertexFormat} [options.vertexFormat=VertexFormat.DEFAULT] The vertex attributes to be computed.
  *
  * @exception {DeveloperError} options.length must be greater than 0.
  *
- * @see RarSensorGeometry.createGeometry
+ * @see SarSensorGeometry.createGeometry
  *
  * @example
  * // create sarSensor geometry
- * var sarSensor = new Cesium.RarSensorGeometry({
+ * var sarSensor = new Cesium.SarSensorGeometry({
  *     length: 200000,
- *     leftRange: 2000
+ *     leftWidth: 2000
  * });
- * var geometry = Cesium.RarSensorGeometry.createGeometry(sarSensor);
+ * var geometry = Cesium.SarSensorGeometry.createGeometry(sarSensor);
  */
-function RarSensorGeometry(options) {
+function SarSensorGeometry(options) {
   options = defaultValue(options, defaultValue.EMPTY_OBJECT);
   var vertexFormat = defaultValue(options.vertexFormat, VertexFormat.DEFAULT);
   var length = options.length;
   var minLeftAngle = defaultValue(options.minLeftAngle, CesiumMath.PI_OVER_SIX);
-  var maxLeftAngle = defaultValue(options.maxLeftAngle, CesiumMath.PI_OVER_FOUR);
-  var minRightAngle = defaultValue(options.minRightAngle, CesiumMath.PI_OVER_SIX);
-  var maxRightAngle = defaultValue(options.maxRightAngle, CesiumMath.PI_OVER_FOUR);
-  var leftRange = defaultValue(options.leftRange, 0); // 幅宽 0米
-  var rightRange = defaultValue(options.rightRange, 0); // 幅宽 0米
+  var maxLeftAngle = defaultValue(
+    options.maxLeftAngle,
+    CesiumMath.PI_OVER_FOUR
+  );
+  var minRightAngle = defaultValue(
+    options.minRightAngle,
+    CesiumMath.PI_OVER_SIX
+  );
+  var maxRightAngle = defaultValue(
+    options.maxRightAngle,
+    CesiumMath.PI_OVER_FOUR
+  );
+  var leftWidth = defaultValue(options.leftWidth, 1000); // 幅宽 0米
+  var rightWidth = defaultValue(options.rightWidth, 1000); // 幅宽 0米
   //>>includeStart('debug', pragmas.debug);
   if (!defined(length)) {
     throw new DeveloperError("options.length must be defined.");
@@ -78,8 +87,8 @@ function RarSensorGeometry(options) {
   this._maxLeftAngle = maxLeftAngle;
   this._minRightAngle = minRightAngle;
   this._maxRightAngle = maxRightAngle;
-  this._leftRange = leftRange;
-  this._rightRange = rightRange;
+  this._leftWidth = leftWidth;
+  this._rightWidth = rightWidth;
   this._vertexFormat = VertexFormat.clone(vertexFormat);
   this._offsetAttribute = options.offsetAttribute;
   this._workerName = "createSarSensorGeometry";
@@ -89,18 +98,18 @@ function RarSensorGeometry(options) {
  * The number of elements used to pack the object into an array.
  * @type {Number}
  */
-RarSensorGeometry.packedLength = VertexFormat.packedLength + 8;
+SarSensorGeometry.packedLength = VertexFormat.packedLength + 8;
 
 /**
  * Stores the provided instance into the provided array.
  *
- * @param {RarSensorGeometry} value The value to pack.
+ * @param {SarSensorGeometry} value The value to pack.
  * @param {Number[]} array The array to pack into.
  * @param {Number} [startingIndex=0] The index into the array at which to start packing the elements.
  *
  * @returns {Number[]} The array that was packed into
  */
-RarSensorGeometry.pack = function (value, array, startingIndex) {
+SarSensorGeometry.pack = function (value, array, startingIndex) {
   //>>includeStart('debug', pragmas.debug);
   if (!defined(value)) {
     throw new DeveloperError("value is required");
@@ -120,8 +129,8 @@ RarSensorGeometry.pack = function (value, array, startingIndex) {
   array[startingIndex++] = value._maxLeftAngle;
   array[startingIndex++] = value._minRightAngle;
   array[startingIndex++] = value._maxRightAngle;
-  array[startingIndex++] = value._leftRange;
-  array[startingIndex++] = value._rightRange;
+  array[startingIndex++] = value._leftWidth;
+  array[startingIndex++] = value._rightWidth;
   array[startingIndex] = defaultValue(value._offsetAttribute, -1);
 
   return array;
@@ -131,13 +140,13 @@ var scratchVertexFormat = new VertexFormat();
 var scratchOptions = {
   vertexFormat: scratchVertexFormat,
   length: undefined,
-  minLeftAngle : undefined,
-  maxLeftAngle : undefined,
-  minRightAngle : undefined,
-  maxRightAngle : undefined,
-  leftRange : undefined,
-  rightRange : undefined,
-  offsetAttribute : undefined,
+  minLeftAngle: undefined,
+  maxLeftAngle: undefined,
+  minRightAngle: undefined,
+  maxRightAngle: undefined,
+  leftWidth: undefined,
+  rightWidth: undefined,
+  offsetAttribute: undefined,
 };
 
 /**
@@ -145,10 +154,10 @@ var scratchOptions = {
  *
  * @param {Number[]} array The packed array.
  * @param {Number} [startingIndex=0] The starting index of the element to be unpacked.
- * @param {RarSensorGeometry} [result] The object into which to store the result.
- * @returns {RarSensorGeometry} The modified result parameter or a new RarSensorGeometry instance if one was not provided.
+ * @param {SarSensorGeometry} [result] The object into which to store the result.
+ * @returns {SarSensorGeometry} The modified result parameter or a new SarSensorGeometry instance if one was not provided.
  */
-RarSensorGeometry.unpack = function (array, startingIndex, result) {
+SarSensorGeometry.unpack = function (array, startingIndex, result) {
   //>>includeStart('debug', pragmas.debug);
   if (!defined(array)) {
     throw new DeveloperError("array is required");
@@ -169,8 +178,8 @@ RarSensorGeometry.unpack = function (array, startingIndex, result) {
   var maxLeftAngle = array[startingIndex++];
   var minRightAngle = array[startingIndex++];
   var maxRightAngle = array[startingIndex++];
-  var leftRange = array[startingIndex++];
-  var rightRange = array[startingIndex++];
+  var leftWidth = array[startingIndex++];
+  var rightWidth = array[startingIndex++];
   var offsetAttribute = array[startingIndex];
 
   if (!defined(result)) {
@@ -179,11 +188,11 @@ RarSensorGeometry.unpack = function (array, startingIndex, result) {
     scratchOptions.maxLeftAngle = maxLeftAngle;
     scratchOptions.minRightAngle = minRightAngle;
     scratchOptions.maxRightAngle = maxRightAngle;
-    scratchOptions.leftRange = leftRange;
-    scratchOptions.rightRange = rightRange;
+    scratchOptions.leftWidth = leftWidth;
+    scratchOptions.rightWidth = rightWidth;
     scratchOptions.offsetAttribute =
       offsetAttribute === -1 ? undefined : offsetAttribute;
-    return new RarSensorGeometry(scratchOptions);
+    return new SarSensorGeometry(scratchOptions);
   }
 
   result._vertexFormat = VertexFormat.clone(vertexFormat, result._vertexFormat);
@@ -192,8 +201,8 @@ RarSensorGeometry.unpack = function (array, startingIndex, result) {
   result._maxLeftAngle = maxLeftAngle;
   result._minRightAngle = minRightAngle;
   result._maxRightAngle = maxRightAngle;
-  result._leftRange = leftRange;
-  result._rightRange = rightRange;
+  result._leftWidth = leftWidth;
+  result._rightWidth = rightWidth;
   result._offsetAttribute =
     offsetAttribute === -1 ? undefined : offsetAttribute;
 
@@ -203,73 +212,70 @@ RarSensorGeometry.unpack = function (array, startingIndex, result) {
 /**
  * Computes the geometric representation of a sarSensor, including its vertices, indices, and a bounding sphere.
  *
- * @param {RarSensorGeometry} sarSensorGeometry A description of the sarSensor.
+ * @param {SarSensorGeometry} sarSensorGeometry A description of the sarSensor.
  * @returns {Geometry|undefined} The computed vertices and indices.
  */
-RarSensorGeometry.createGeometry = function (sarSensorGeometry) {
-  let vertexFormat = sarSensorGeometry._vertexFormat;
-  let length = sarSensorGeometry._length;
-  let minLeftAngle = sarSensorGeometry._minLeftAngle;
-  let maxLeftAngle = sarSensorGeometry._maxLeftAngle;
-  let minRightAngle = sarSensorGeometry._minRightAngle;
-  let maxRightAngle = sarSensorGeometry._maxRightAngle;
-  let leftRange = sarSensorGeometry._leftRange;
-  let rightRange = sarSensorGeometry._rightRange;
+SarSensorGeometry.createGeometry = function (sarSensorGeometry) {
+  var vertexFormat = sarSensorGeometry._vertexFormat;
+  var length = sarSensorGeometry._length;
+  var minLeftAngle = sarSensorGeometry._minLeftAngle;
+  var maxLeftAngle = sarSensorGeometry._maxLeftAngle;
+  var minRightAngle = sarSensorGeometry._minRightAngle;
+  var maxRightAngle = sarSensorGeometry._maxRightAngle;
+  var leftWidth = sarSensorGeometry._leftWidth;
+  var rightWidth = sarSensorGeometry._rightWidth;
 
-  if (
-    length <= 0
-  ) {
+  if (length <= 0) {
     return;
   }
 
-  if(leftRange < 0) {
-    leftRange = 0;
+  if (leftWidth < 0) {
+    leftWidth = 0;
   }
 
-  if(rightRange < 0) {
-    rightRange = 0;
+  if (rightWidth < 0) {
+    rightWidth = 0;
   }
 
-  if(leftRange===0 && rightRange ===0) {
+  if (leftWidth === 0 && rightWidth === 0) {
     return;
   }
 
   // buffers
-  let positionIndex = 0;
-  let normalIndex = 0;
-  let tangentIndex = 0;
-  let bitangentIndex = 0;
-  let stIndex = 0;
-  let index = 0;
+  var positionIndex = 0;
+  var normalIndex = 0;
+  var tangentIndex = 0;
+  var bitangentIndex = 0;
+  var stIndex = 0;
+  var index = 0;
   // 四个三角面 + 底面四边形
-  let vertexCount = (3 * 4 + 4) * 2;
-  let numIndices = 6 * 3 * 2;
-  if(leftRange === 0 || rightRange === 0) {
+  var vertexCount = (3 * 4 + 4) * 2;
+  var numIndices = 6 * 3 * 2;
+  if (leftWidth === 0 || rightWidth === 0) {
     vertexCount = 3 * 4 + 4;
-    numIndices = 6 *3;
+    numIndices = 6 * 3;
   }
-  let indices  = IndexDatatype.createTypedArray(vertexCount, numIndices);
-  let positions = new Float64Array(vertexCount * 3);
-  let normals = vertexFormat.normal
-                ? new Float32Array(vertexCount * 3)
-                : undefined;
-  let tangents = vertexFormat.tangent
-                 ? new Float32Array(vertexCount * 3)
-                 : undefined;
-  let bitangents = vertexFormat.bitangent
-                   ? new Float32Array(vertexCount * 3)
-                   : undefined;
-  let st = vertexFormat.st ? new Float32Array(vertexCount * 2) : undefined;
+  var indices = IndexDatatype.createTypedArray(vertexCount, numIndices);
+  var positions = new Float64Array(vertexCount * 3);
+  var normals = vertexFormat.normal
+    ? new Float32Array(vertexCount * 3)
+    : undefined;
+  var tangents = vertexFormat.tangent
+    ? new Float32Array(vertexCount * 3)
+    : undefined;
+  var bitangents = vertexFormat.bitangent
+    ? new Float32Array(vertexCount * 3)
+    : undefined;
+  var st = vertexFormat.st ? new Float32Array(vertexCount * 2) : undefined;
 
-  let min_left_length = length * Math.sin(minLeftAngle);
-  let max_left_length = length * Math.sin(maxLeftAngle);
-  let min_right_length = length * Math.sin(minRightAngle);
-  let max_right_length = length * Math.sin(maxRightAngle);
-  let half_left_range = leftRange / 2;
-  let half_right_range = rightRange / 2;
+  var min_left_length = length * Math.sin(minLeftAngle);
+  var max_left_length = length * Math.sin(maxLeftAngle);
+  var min_right_length = length * Math.sin(minRightAngle);
+  var max_right_length = length * Math.sin(maxRightAngle);
+  var half_left_range = leftWidth / 2;
+  var half_right_range = rightWidth / 2;
 
-
-  if(leftRange > 0) {
+  if (leftWidth > 0) {
     // 前面
     positions[positionIndex++] = 0;
     positions[positionIndex++] = 0;
@@ -328,17 +334,17 @@ RarSensorGeometry.createGeometry = function (sarSensorGeometry) {
     positions[positionIndex++] = -half_left_range;
     positions[positionIndex++] = -length;
 
-    let angle = Math.atan2(length,half_left_range);
-    let angles = [angle,-minLeftAngle,angle,maxLeftAngle];
-    let computeNormal =
+    var angle = Math.atan2(length, half_left_range);
+    var angles = [angle, -minLeftAngle, angle, maxLeftAngle];
+    var computeNormal =
       vertexFormat.normal || vertexFormat.tangent || vertexFormat.bitangent;
-    for(let i=0; i<4;i++) {
+    for (let i = 0; i < 4; i++) {
       if (computeNormal) {
-        let computeTangent = vertexFormat.tangent || vertexFormat.bitangent;
-        let normal = normalScratch;
-        let tangent = tangentScratch;
-        let bitangent = bitangentScratch;
-        let normalScale = 0.0;
+        var computeTangent = vertexFormat.tangent || vertexFormat.bitangent;
+        var normal = normalScratch;
+        var tangent = tangentScratch;
+        var bitangent = bitangentScratch;
+        var normalScale = 0.0;
 
         normal.z = Math.sin(angles[i]);
         normalScale = Math.cos(angles[i]);
@@ -443,12 +449,13 @@ RarSensorGeometry.createGeometry = function (sarSensorGeometry) {
       }
     }
     // uv
-    let maxRange = Math.max(leftRange,rightRange);
+    var maxRange = Math.max(leftWidth, rightWidth);
     if (vertexFormat.st) {
-      for (i = 0; i < 3 * 4; i++) {
-        let position = Cartesian3.fromArray(positions, i * 3, positionScratch);
-        st[stIndex++] = (position.x + max_left_length) / (max_left_length + max_right_length);
-        st[stIndex++] = (position.y / maxRange) + 0.5;
+      for (let i = 0; i < 3 * 4; i++) {
+        var position = Cartesian3.fromArray(positions, i * 3, positionScratch);
+        st[stIndex++] =
+          (position.x + max_left_length) / (max_left_length + max_right_length);
+        st[stIndex++] = position.y / maxRange + 0.5;
       }
 
       st[stIndex++] = 0.0;
@@ -472,8 +479,7 @@ RarSensorGeometry.createGeometry = function (sarSensorGeometry) {
 
     indices[index++] = 6;
     indices[index++] = 8;
-    indices[index++] = 7
-    ;
+    indices[index++] = 7;
     indices[index++] = 9;
     indices[index++] = 11;
     indices[index++] = 10;
@@ -487,9 +493,9 @@ RarSensorGeometry.createGeometry = function (sarSensorGeometry) {
     indices[index++] = 15;
   }
 
-  let rightStartPositionIndex = Math.floor(positionIndex / 3);
+  var rightStartPositionIndex = Math.floor(positionIndex / 3);
 
-  if(rightRange > 0) {
+  if (rightWidth > 0) {
     // 前面
     positions[positionIndex++] = 0;
     positions[positionIndex++] = 0;
@@ -548,17 +554,17 @@ RarSensorGeometry.createGeometry = function (sarSensorGeometry) {
     positions[positionIndex++] = -half_right_range;
     positions[positionIndex++] = -length;
 
-    let angle = Math.atan2(length,half_right_range);
-    let angles = [angle,maxRightAngle,angle,-minRightAngle];
-    let computeNormal =
+    var angle = Math.atan2(length, half_right_range);
+    var angles = [angle, maxRightAngle, angle, -minRightAngle];
+    var computeNormal =
       vertexFormat.normal || vertexFormat.tangent || vertexFormat.bitangent;
-    for(let i=0; i<4;i++) {
+    for (let i = 0; i < 4; i++) {
       if (computeNormal) {
-        let computeTangent = vertexFormat.tangent || vertexFormat.bitangent;
-        let normal = normalScratch;
-        let tangent = tangentScratch;
-        let bitangent = bitangentScratch;
-        let normalScale = 0.0;
+        var computeTangent = vertexFormat.tangent || vertexFormat.bitangent;
+        var normal = normalScratch;
+        var tangent = tangentScratch;
+        var bitangent = bitangentScratch;
+        var normalScale = 0.0;
 
         if (computeTangent) {
           tangent = Cartesian3.normalize(
@@ -663,10 +669,12 @@ RarSensorGeometry.createGeometry = function (sarSensorGeometry) {
     }
     // uv
     if (vertexFormat.st) {
-      for (i = 0; i < 3 * 4; i++) {
-        let position = Cartesian3.fromArray(positions, i * 3, positionScratch);
-        st[stIndex++] = (position.x + leftHalfAngle) / (leftHalfAngle + rightHalfAngle);
-        st[stIndex++] = (position.y + backHalfAngle) / (frontHalfAngle + backHalfAngle);
+      for (let i = 0; i < 3 * 4; i++) {
+        var position = Cartesian3.fromArray(positions, i * 3, positionScratch);
+        st[stIndex++] =
+          (position.x + leftHalfAngle) / (leftHalfAngle + rightHalfAngle);
+        st[stIndex++] =
+          (position.y + backHalfAngle) / (frontHalfAngle + backHalfAngle);
       }
 
       st[stIndex++] = 0.0;
@@ -690,8 +698,7 @@ RarSensorGeometry.createGeometry = function (sarSensorGeometry) {
 
     indices[index++] = rightStartPositionIndex + 6;
     indices[index++] = rightStartPositionIndex + 8;
-    indices[index++] = rightStartPositionIndex + 7
-    ;
+    indices[index++] = rightStartPositionIndex + 7;
     indices[index++] = rightStartPositionIndex + 9;
     indices[index++] = rightStartPositionIndex + 11;
     indices[index++] = rightStartPositionIndex + 10;
@@ -704,7 +711,7 @@ RarSensorGeometry.createGeometry = function (sarSensorGeometry) {
     indices[index++] = rightStartPositionIndex + 14;
     indices[index++] = rightStartPositionIndex + 15;
   }
-  let attributes = new GeometryAttributes();
+  var attributes = new GeometryAttributes();
   if (vertexFormat.position) {
     attributes.position = new GeometryAttribute({
       componentDatatype: ComponentDatatype.DOUBLE,
@@ -746,22 +753,24 @@ RarSensorGeometry.createGeometry = function (sarSensorGeometry) {
   }
 
   radiusScratch.x = length;
-  let ll = max_left_length * max_left_length + half_left_range * half_left_range;
-  let rr = max_right_length * max_right_length + half_right_range * half_right_range;
+  var ll =
+    max_left_length * max_left_length + half_left_range * half_left_range;
+  var rr =
+    max_right_length * max_right_length + half_right_range * half_right_range;
   radiusScratch.y = Math.max(Math.sqrt(ll), Math.sqrt(rr));
 
-  let boundingSphere = new BoundingSphere(
+  var boundingSphere = new BoundingSphere(
     new Cartesian3(0, 0, 0),
     Cartesian2.magnitude(radiusScratch)
   );
 
   if (defined(sarSensorGeometry._offsetAttribute)) {
     length = positions.length;
-    let applyOffset = new Uint8Array(length / 3);
-    let offsetValue =
+    var applyOffset = new Uint8Array(length / 3);
+    var offsetValue =
       sarSensorGeometry._offsetAttribute === GeometryOffsetAttribute.NONE
-      ? 0
-      : 1;
+        ? 0
+        : 1;
     arrayFill(applyOffset, offsetValue);
     attributes.applyOffset = new GeometryAttribute({
       componentDatatype: ComponentDatatype.UNSIGNED_BYTE,
@@ -779,4 +788,4 @@ RarSensorGeometry.createGeometry = function (sarSensorGeometry) {
   });
 };
 
-export default RarSensorGeometry;
+export default SarSensorGeometry;

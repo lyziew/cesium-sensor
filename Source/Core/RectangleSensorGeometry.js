@@ -52,10 +52,22 @@ function RectangleSensorGeometry(options) {
   options = defaultValue(options, defaultValue.EMPTY_OBJECT);
   var vertexFormat = defaultValue(options.vertexFormat, VertexFormat.DEFAULT);
   var length = options.length;
-  var leftHalfAngle = defaultValue(options.leftHalfAngle, CesiumMath.PI_OVER_SIX);
-  var rightHalfAngle = defaultValue(options.rightHalfAngle, CesiumMath.PI_OVER_SIX);
-  var frontHalfAngle = defaultValue(options.frontHalfAngle, CesiumMath.PI_OVER_SIX);
-  var backHalfAngle = defaultValue(options.backHalfAngle, CesiumMath.PI_OVER_SIX);
+  var leftHalfAngle = defaultValue(
+    options.leftHalfAngle,
+    CesiumMath.PI_OVER_SIX
+  );
+  var rightHalfAngle = defaultValue(
+    options.rightHalfAngle,
+    CesiumMath.PI_OVER_SIX
+  );
+  var frontHalfAngle = defaultValue(
+    options.frontHalfAngle,
+    CesiumMath.PI_OVER_SIX
+  );
+  var backHalfAngle = defaultValue(
+    options.backHalfAngle,
+    CesiumMath.PI_OVER_SIX
+  );
   //>>includeStart('debug', pragmas.debug);
   if (!defined(length)) {
     throw new DeveloperError("options.length must be defined.");
@@ -125,11 +137,11 @@ var scratchVertexFormat = new VertexFormat();
 var scratchOptions = {
   vertexFormat: scratchVertexFormat,
   length: undefined,
-  leftHalfAngle : undefined,
-  rightHalfAngle : undefined,
-  frontHalfAngle : undefined,
-  backHalfAngle : undefined,
-  offsetAttribute : undefined,
+  leftHalfAngle: undefined,
+  rightHalfAngle: undefined,
+  frontHalfAngle: undefined,
+  backHalfAngle: undefined,
+  offsetAttribute: undefined,
 };
 
 /**
@@ -205,7 +217,7 @@ RectangleSensorGeometry.createGeometry = function (rectangleSensorGeometry) {
     leftHalfAngle <= 0 ||
     rightHalfAngle <= 0 ||
     frontHalfAngle <= 0 ||
-    (backHalfAngle <= 0)
+    backHalfAngle <= 0
   ) {
     return;
   }
@@ -221,23 +233,23 @@ RectangleSensorGeometry.createGeometry = function (rectangleSensorGeometry) {
   var vertexCount = 3 * 4 + 4;
   // 上下面 + 内外面 + 2个截面
   var numIndices = 18;
-  var indices  = IndexDatatype.createTypedArray(vertexCount, numIndices);
+  var indices = IndexDatatype.createTypedArray(vertexCount, numIndices);
   var positions = new Float64Array(vertexCount * 3);
   var normals = vertexFormat.normal
-                ? new Float32Array(vertexCount * 3)
-                : undefined;
+    ? new Float32Array(vertexCount * 3)
+    : undefined;
   var tangents = vertexFormat.tangent
-                 ? new Float32Array(vertexCount * 3)
-                 : undefined;
+    ? new Float32Array(vertexCount * 3)
+    : undefined;
   var bitangents = vertexFormat.bitangent
-                   ? new Float32Array(vertexCount * 3)
-                   : undefined;
+    ? new Float32Array(vertexCount * 3)
+    : undefined;
   var st = vertexFormat.st ? new Float32Array(vertexCount * 2) : undefined;
 
-  let front_length = length * Math.sin(frontHalfAngle);
-  let back_length = length * Math.sin(backHalfAngle);
-  let left_length = length * Math.sin(leftHalfAngle);
-  let right_length = length * Math.sin(rightHalfAngle);
+  var front_length = length * Math.sin(frontHalfAngle);
+  var back_length = length * Math.sin(backHalfAngle);
+  var left_length = length * Math.sin(leftHalfAngle);
+  var right_length = length * Math.sin(rightHalfAngle);
   // 前面
   positions[positionIndex++] = 0;
   positions[positionIndex++] = 0;
@@ -296,10 +308,10 @@ RectangleSensorGeometry.createGeometry = function (rectangleSensorGeometry) {
   positions[positionIndex++] = -back_length;
   positions[positionIndex++] = -length;
 
-  var angles = [frontHalfAngle,rightHalfAngle,backHalfAngle,leftHalfAngle];
+  var angles = [frontHalfAngle, rightHalfAngle, backHalfAngle, leftHalfAngle];
   var computeNormal =
     vertexFormat.normal || vertexFormat.tangent || vertexFormat.bitangent;
-  for(let i=0; i<4;i++) {
+  for (let i = 0; i < 4; i++) {
     if (computeNormal) {
       var computeTangent = vertexFormat.tangent || vertexFormat.bitangent;
       var normal = normalScratch;
@@ -411,7 +423,7 @@ RectangleSensorGeometry.createGeometry = function (rectangleSensorGeometry) {
   }
   // uv
   if (vertexFormat.st) {
-    for (i = 0; i < 3 * 4; i++) {
+    for (let i = 0; i < 3 * 4; i++) {
       var position = Cartesian3.fromArray(positions, i * 3, positionScratch);
       st[stIndex++] = (position.x + left_length) / (left_length + right_length);
       st[stIndex++] = (position.y + back_length) / (back_length + front_length);
@@ -493,7 +505,12 @@ RectangleSensorGeometry.createGeometry = function (rectangleSensorGeometry) {
   var ff = front_length * front_length;
   var rr = right_length * right_length;
   var bb = back_length * back_length;
-  radiusScratch.y = Math.max(Math.sqrt( ll + ff),Math.sqrt(ff + rr),Math.sqrt(rr + bb),Math.sqrt(bb + ll));
+  radiusScratch.y = Math.max(
+    Math.sqrt(ll + ff),
+    Math.sqrt(ff + rr),
+    Math.sqrt(rr + bb),
+    Math.sqrt(bb + ll)
+  );
 
   var boundingSphere = new BoundingSphere(
     new Cartesian3(0, 0, 0),
@@ -505,8 +522,8 @@ RectangleSensorGeometry.createGeometry = function (rectangleSensorGeometry) {
     var applyOffset = new Uint8Array(length / 3);
     var offsetValue =
       rectangleSensorGeometry._offsetAttribute === GeometryOffsetAttribute.NONE
-      ? 0
-      : 1;
+        ? 0
+        : 1;
     arrayFill(applyOffset, offsetValue);
     attributes.applyOffset = new GeometryAttribute({
       componentDatatype: ComponentDatatype.UNSIGNED_BYTE,

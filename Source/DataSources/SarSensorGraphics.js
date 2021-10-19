@@ -16,8 +16,8 @@ import createPropertyDescriptor from "./createPropertyDescriptor.js";
  * @property {Property | number} [maxLeftAngle] A numeric Property specifying the max left angle of the sarSensor.
  * @property {Property | number} [minRightAngle] A numeric Property specifying the min right angle of the sarSensor.
  * @property {Property | number} [maxRightAngle] A numeric Property specifying the max right angle of the sarSensor.
- * @property {Property | number} [leftRange] A numeric Property specifying the left range of the sarSensor.
- * @property {Property | number} [rightRange] A numeric Property specifying the right range of the sarSensor.
+ * @property {Property | number} [leftWidth] A numeric Property specifying the left range of the sarSensor.
+ * @property {Property | number} [rightWidth] A numeric Property specifying the right range of the sarSensor.
  * @property {Property | HeightReference} [heightReference=HeightReference.NONE] A Property specifying what the height from the entity position is relative to.
  * @property {Property | boolean} [fill=true] A boolean Property specifying whether the sarSensor is filled with the provided material.
  * @property {MaterialProperty | Color} [material=Color.WHITE] A Property specifying the material used to fill the sarSensor.
@@ -53,10 +53,10 @@ function SarSensorGraphics(options) {
   this._minRightAngleSubscription = undefined;
   this._maxRightAngle = undefined;
   this._maxRightAngleSubscription = undefined;
-  this._leftRange = undefined;
-  this._leftRangeSubscription = undefined;
-  this._rightRange = undefined;
-  this._rightRangeSubscription = undefined;
+  this._leftWidth = undefined;
+  this._leftWidthSubscription = undefined;
+  this._rightWidth = undefined;
+  this._rightWidthSubscription = undefined;
   this._heightReference = undefined;
   this._heightReferenceSubscription = undefined;
   this._fill = undefined;
@@ -143,14 +143,14 @@ Object.defineProperties(SarSensorGraphics.prototype, {
    * @memberof SarSensorGraphics.prototype
    * @type {Property|undefined}
    */
-  leftRange: createPropertyDescriptor("leftRange"),
+  leftWidth: createPropertyDescriptor("leftWidth"),
 
   /**
    * Gets or sets the numeric Property specifying the right range of the sarSensor.
    * @memberof SarSensorGraphics.prototype
    * @type {Property|undefined}
    */
-  rightRange: createPropertyDescriptor("rightRange"),
+  rightWidth: createPropertyDescriptor("rightWidth"),
 
   /**
    * Gets or sets the Property specifying the {@link HeightReference}.
@@ -251,8 +251,8 @@ SarSensorGraphics.prototype.clone = function (result) {
   result.maxLeftAngle = this.maxLeftAngle;
   result.minRightAngle = this.minRightAngle;
   result.maxRightAngle = this.maxRightAngle;
-  result.leftRange = this.leftRange;
-  result.rightRange = this.rightRange;
+  result.leftWidth = this.leftWidth;
+  result.rightWidth = this.rightWidth;
   result.heightReference = this.heightReference;
   result.fill = this.fill;
   result.material = this.material;
@@ -285,8 +285,8 @@ SarSensorGraphics.prototype.merge = function (source) {
   this.maxLeftAngle = defaultValue(this.maxLeftAngle, source.maxLeftAngle);
   this.minRightAngle = defaultValue(this.minRightAngle, source.minRightAngle);
   this.maxRightAngle = defaultValue(this.maxRightAngle, source.maxRightAngle);
-  this.leftRange = defaultValue(this.leftRange, source.leftRange);
-  this.rightRange = defaultValue(this.rightRange, source.rightRange);
+  this.leftWidth = defaultValue(this.leftWidth, source.leftWidth);
+  this.rightWidth = defaultValue(this.rightWidth, source.rightWidth);
   this.heightReference = defaultValue(
     this.heightReference,
     source.heightReference

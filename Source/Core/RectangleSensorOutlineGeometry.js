@@ -47,10 +47,22 @@ import PrimitiveType from "./PrimitiveType.js";
 function RectangleSensorOutlineGeometry(options) {
   options = defaultValue(options, defaultValue.EMPTY_OBJECT);
   var length = options.length;
-  var leftHalfAngle = defaultValue(options.leftHalfAngle, CesiumMath.PI_OVER_SIX);
-  var rightHalfAngle = defaultValue(options.rightHalfAngle, CesiumMath.PI_OVER_SIX);
-  var frontHalfAngle = defaultValue(options.frontHalfAngle, CesiumMath.PI_OVER_SIX);
-  var backHalfAngle = defaultValue(options.backHalfAngle, CesiumMath.PI_OVER_SIX);
+  var leftHalfAngle = defaultValue(
+    options.leftHalfAngle,
+    CesiumMath.PI_OVER_SIX
+  );
+  var rightHalfAngle = defaultValue(
+    options.rightHalfAngle,
+    CesiumMath.PI_OVER_SIX
+  );
+  var frontHalfAngle = defaultValue(
+    options.frontHalfAngle,
+    CesiumMath.PI_OVER_SIX
+  );
+  var backHalfAngle = defaultValue(
+    options.backHalfAngle,
+    CesiumMath.PI_OVER_SIX
+  );
   //>>includeStart('debug', pragmas.debug);
   if (!defined(length)) {
     throw new DeveloperError("options.length must be defined.");
@@ -113,11 +125,11 @@ RectangleSensorOutlineGeometry.pack = function (value, array, startingIndex) {
 
 var scratchOptions = {
   length: undefined,
-  leftHalfAngle : undefined,
-  rightHalfAngle : undefined,
-  frontHalfAngle : undefined,
-  backHalfAngle : undefined,
-  offsetAttribute : undefined,
+  leftHalfAngle: undefined,
+  rightHalfAngle: undefined,
+  frontHalfAngle: undefined,
+  backHalfAngle: undefined,
+  offsetAttribute: undefined,
 };
 /**
  * Retrieves an instance from a packed array.
@@ -127,7 +139,11 @@ var scratchOptions = {
  * @param {RectangleSensorOutlineGeometry} [result] The object into which to store the result.
  * @returns {RectangleSensorOutlineGeometry} The modified result parameter or a new RectangleSensorOutlineGeometry instance if one was not provided.
  */
-RectangleSensorOutlineGeometry.unpack = function (array, startingIndex, result) {
+RectangleSensorOutlineGeometry.unpack = function (
+  array,
+  startingIndex,
+  result
+) {
   //>>includeStart('debug', pragmas.debug);
   if (!defined(array)) {
     throw new DeveloperError("array is required");
@@ -168,7 +184,9 @@ RectangleSensorOutlineGeometry.unpack = function (array, startingIndex, result) 
  * @param {RectangleSensorOutlineGeometry} RectangleSensorOutlineGeometry A description of the rectangleSensor outline.
  * @returns {Geometry|undefined} The computed vertices and indices.
  */
-RectangleSensorOutlineGeometry.createGeometry = function (rectangleSensorGeometry) {
+RectangleSensorOutlineGeometry.createGeometry = function (
+  rectangleSensorGeometry
+) {
   var length = rectangleSensorGeometry._length;
   var leftHalfAngle = rectangleSensorGeometry._leftHalfAngle;
   var rightHalfAngle = rectangleSensorGeometry._rightHalfAngle;
@@ -180,7 +198,7 @@ RectangleSensorOutlineGeometry.createGeometry = function (rectangleSensorGeometr
     leftHalfAngle <= 0 ||
     rightHalfAngle <= 0 ||
     frontHalfAngle <= 0 ||
-    (backHalfAngle <= 0)
+    backHalfAngle <= 0
   ) {
     return;
   }
@@ -189,16 +207,16 @@ RectangleSensorOutlineGeometry.createGeometry = function (rectangleSensorGeometr
   var positionIndex = 0;
   var index = 0;
   // 上下顶 + 外面 + 内面
-  var vertexCount = 10;
+  var vertexCount = 5;
   // 上下面 + 内外面 + 2个截面
-  var numIndices = 28;
-  var indices  = IndexDatatype.createTypedArray(vertexCount, numIndices);
+  var numIndices = 16;
+  var indices = IndexDatatype.createTypedArray(vertexCount, numIndices);
   var positions = new Float64Array(vertexCount * 3);
 
-  let front_length = length * Math.sin(frontHalfAngle);
-  let back_length = length * Math.sin(backHalfAngle);
-  let left_length = length * Math.sin(leftHalfAngle);
-  let right_length = length * Math.sin(rightHalfAngle);
+  var front_length = length * Math.sin(frontHalfAngle);
+  var back_length = length * Math.sin(backHalfAngle);
+  var left_length = length * Math.sin(leftHalfAngle);
+  var right_length = length * Math.sin(rightHalfAngle);
   // 顶点 0
   positions[positionIndex++] = 0;
   positions[positionIndex++] = 0;
@@ -207,37 +225,17 @@ RectangleSensorOutlineGeometry.createGeometry = function (rectangleSensorGeometr
   positions[positionIndex++] = -left_length;
   positions[positionIndex++] = front_length;
   positions[positionIndex++] = -length;
-  // 中上点 2
-  positions[positionIndex++] = 0;
-  positions[positionIndex++] = front_length;
-  positions[positionIndex++] = -length;
-  // 右上 3
+  // 右上 2
   positions[positionIndex++] = right_length;
   positions[positionIndex++] = front_length;
   positions[positionIndex++] = -length;
-  // 右中点 4
-  positions[positionIndex++] = right_length;
-  positions[positionIndex++] = 0;
-  positions[positionIndex++] = -length;
-  // 右下 5
+  // 右下 3
   positions[positionIndex++] = right_length;
   positions[positionIndex++] = -back_length;
   positions[positionIndex++] = -length;
-  // 中下点 6
-  positions[positionIndex++] = 0;
-  positions[positionIndex++] = -back_length;
-  positions[positionIndex++] = -length;
-  // 左下 7
+  // 左下 4
   positions[positionIndex++] = -left_length;
   positions[positionIndex++] = -back_length;
-  positions[positionIndex++] = -length;
-  // 左中点 8
-  positions[positionIndex++] = -left_length;
-  positions[positionIndex++] = 0;
-  positions[positionIndex++] = -length;
-  // 底面中心 9
-  positions[positionIndex++] = 0;
-  positions[positionIndex++] = 0;
   positions[positionIndex++] = -length;
 
   // line
@@ -249,26 +247,14 @@ RectangleSensorOutlineGeometry.createGeometry = function (rectangleSensorGeometr
   indices[index++] = 3;
   indices[index++] = 0;
   indices[index++] = 4;
-  indices[index++] = 0;
-  indices[index++] = 5;
-  indices[index++] = 0;
-  indices[index++] = 6;
-  indices[index++] = 0;
-  indices[index++] = 7;
-  indices[index++] = 0;
-  indices[index++] = 8;
-  indices[index++] = 1;
-  indices[index++] = 3;
-  indices[index++] = 3;
-  indices[index++] = 5;
-  indices[index++] = 5;
-  indices[index++] = 7;
-  indices[index++] = 7;
   indices[index++] = 1;
   indices[index++] = 2;
-  indices[index++] = 6;
+  indices[index++] = 2;
+  indices[index++] = 3;
+  indices[index++] = 3;
   indices[index++] = 4;
-  indices[index++] = 8;
+  indices[index++] = 4;
+  indices[index++] = 1;
 
   var attributes = new GeometryAttributes();
   attributes.position = new GeometryAttribute({
@@ -283,7 +269,12 @@ RectangleSensorOutlineGeometry.createGeometry = function (rectangleSensorGeometr
   var ff = front_length * front_length;
   var rr = right_length * right_length;
   var bb = back_length * back_length;
-  radiusScratch.y = Math.max(Math.sqrt( ll + ff),Math.sqrt(ff + rr),Math.sqrt(rr + bb),Math.sqrt(bb + ll));
+  radiusScratch.y = Math.max(
+    Math.sqrt(ll + ff),
+    Math.sqrt(ff + rr),
+    Math.sqrt(rr + bb),
+    Math.sqrt(bb + ll)
+  );
 
   var boundingSphere = new BoundingSphere(
     new Cartesian3(0, 0, 0),
@@ -295,8 +286,8 @@ RectangleSensorOutlineGeometry.createGeometry = function (rectangleSensorGeometr
     var applyOffset = new Uint8Array(length / 3);
     var offsetValue =
       rectangleSensorGeometry._offsetAttribute === GeometryOffsetAttribute.NONE
-      ? 0
-      : 1;
+        ? 0
+        : 1;
     arrayFill(applyOffset, offsetValue);
     attributes.applyOffset = new GeometryAttribute({
       componentDatatype: ComponentDatatype.UNSIGNED_BYTE,

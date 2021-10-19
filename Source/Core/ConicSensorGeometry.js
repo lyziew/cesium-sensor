@@ -39,27 +39,25 @@ import VertexFormat from "./VertexFormat.js";
  *
  * @example
  * // create conicSensor geometry
- * let conicSensor = new Cesium.ConicSensorGeometry({
+ * var conicSensor = new Cesium.ConicSensorGeometry({
  *     length: 200000,
  *     topRadius: 80000,
  *     bottomRadius: 200000,
  * });
- * let geometry = Cesium.ConicSensorGeometry.createGeometry(conicSensor);
+ * var geometry = Cesium.ConicSensorGeometry.createGeometry(conicSensor);
  */
 function ConicSensorGeometry(options) {
   options = defaultValue(options, defaultValue.EMPTY_OBJECT);
-  let vertexFormat = defaultValue(options.vertexFormat, VertexFormat.DEFAULT);
-  let length = options.length;
-  let topInnerRadius = defaultValue(options.topInnerRadius, 0.0);
-  let topOuterRadius = defaultValue(options.topOuterRadius, 0.0);
-  let bottomInnerRadius = defaultValue(options.bottomInnerRadius, 0.0);
-  let bottomOuterRadius = options.bottomOuterRadius;
-  let thetaSegments = defaultValue(options.thetaSegments, 32);
-  let phiSegments = defaultValue(options.phiSegments, 1);
-  let thetaStart = defaultValue(options.thetaStart, 0.0);
-  let thetaLength = defaultValue(options.thetaLength, CesiumMath.TWO_PI);
-
-
+  var vertexFormat = defaultValue(options.vertexFormat, VertexFormat.DEFAULT);
+  var length = options.length;
+  var topInnerRadius = defaultValue(options.topInnerRadius, 0.0);
+  var topOuterRadius = defaultValue(options.topOuterRadius, 0.0);
+  var bottomInnerRadius = defaultValue(options.bottomInnerRadius, 0.0);
+  var bottomOuterRadius = options.bottomOuterRadius;
+  var thetaSegments = defaultValue(options.thetaSegments, 32);
+  var phiSegments = defaultValue(options.phiSegments, 1);
+  var thetaStart = defaultValue(options.thetaStart, 0.0);
+  var thetaLength = defaultValue(options.thetaLength, CesiumMath.TWO_PI);
 
   //>>includeStart('debug', pragmas.debug);
   if (!defined(length)) {
@@ -143,19 +141,19 @@ ConicSensorGeometry.pack = function (value, array, startingIndex) {
   return array;
 };
 
-let scratchVertexFormat = new VertexFormat();
-let scratchOptions = {
+var scratchVertexFormat = new VertexFormat();
+var scratchOptions = {
   vertexFormat: scratchVertexFormat,
   length: undefined,
-  topInnerRadius : undefined,
-  topOuterRadius : undefined,
-  bottomInnerRadius : undefined,
-  bottomOuterRadius : undefined,
-  thetaSegments : undefined,
-  phiSegments : undefined,
-  thetaStart : undefined,
-  thetaLength : undefined,
-  offsetAttribute : undefined,
+  topInnerRadius: undefined,
+  topOuterRadius: undefined,
+  bottomInnerRadius: undefined,
+  bottomOuterRadius: undefined,
+  thetaSegments: undefined,
+  phiSegments: undefined,
+  thetaStart: undefined,
+  thetaLength: undefined,
+  offsetAttribute: undefined,
 };
 
 /**
@@ -175,23 +173,23 @@ ConicSensorGeometry.unpack = function (array, startingIndex, result) {
 
   startingIndex = defaultValue(startingIndex, 0);
 
-  let vertexFormat = VertexFormat.unpack(
+  var vertexFormat = VertexFormat.unpack(
     array,
     startingIndex,
     scratchVertexFormat
   );
   startingIndex += VertexFormat.packedLength;
 
-  let length = array[startingIndex++];
-  let topInnerRadius = array[startingIndex++];
-  let topOuterRadius = array[startingIndex++];
-  let bottomInnerRadius = array[startingIndex++];
-  let bottomOuterRadius = array[startingIndex++];
-  let thetaSegments = array[startingIndex++];
-  let phiSegments = array[startingIndex++];
-  let thetaStart = array[startingIndex++];
-  let thetaLength = array[startingIndex++];
-  let offsetAttribute = array[startingIndex];
+  var length = array[startingIndex++];
+  var topInnerRadius = array[startingIndex++];
+  var topOuterRadius = array[startingIndex++];
+  var bottomInnerRadius = array[startingIndex++];
+  var bottomOuterRadius = array[startingIndex++];
+  var thetaSegments = array[startingIndex++];
+  var phiSegments = array[startingIndex++];
+  var thetaStart = array[startingIndex++];
+  var thetaLength = array[startingIndex++];
+  var offsetAttribute = array[startingIndex];
 
   if (!defined(result)) {
     scratchOptions.length = length;
@@ -231,16 +229,16 @@ ConicSensorGeometry.unpack = function (array, startingIndex, result) {
  * @returns {Geometry|undefined} The computed vertices and indices.
  */
 ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
-  let vertexFormat = conicSensorGeometry._vertexFormat;
-  let length = conicSensorGeometry._length;
-  let topInnerRadius = conicSensorGeometry._topInnerRadius;
-  let topOuterRadius = conicSensorGeometry._topOuterRadius;
-  let bottomInnerRadius = conicSensorGeometry._bottomInnerRadius;
-  let bottomOuterRadius = conicSensorGeometry._bottomOuterRadius;
-  let thetaSegments = conicSensorGeometry._thetaSegments;
-  let phiSegments = conicSensorGeometry._phiSegments;
-  let thetaStart = conicSensorGeometry._thetaStart;
-  let thetaLength = conicSensorGeometry._thetaLength;
+  var vertexFormat = conicSensorGeometry._vertexFormat;
+  var length = conicSensorGeometry._length;
+  var topInnerRadius = conicSensorGeometry._topInnerRadius;
+  var topOuterRadius = conicSensorGeometry._topOuterRadius;
+  var bottomInnerRadius = conicSensorGeometry._bottomInnerRadius;
+  var bottomOuterRadius = conicSensorGeometry._bottomOuterRadius;
+  var thetaSegments = conicSensorGeometry._thetaSegments;
+  var phiSegments = conicSensorGeometry._phiSegments;
+  var thetaStart = conicSensorGeometry._thetaStart;
+  var thetaLength = conicSensorGeometry._thetaLength;
   // 起始弧度
   thetaStart = thetaStart !== undefined ? thetaStart : 0;
   // 总弧度
@@ -255,65 +253,69 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
     topInnerRadius < 0 ||
     topOuterRadius < 0 ||
     bottomInnerRadius < 0 ||
-    (bottomOuterRadius === 0)
+    bottomOuterRadius === 0
   ) {
     return;
   }
 
   // buffers
-  let positionIndex = 0;
-  let normalIndex = 0;
-  let tangentIndex = 0;
-  let bitangentIndex = 0;
-  let stIndex = 0;
-  let index = 0;
+  var positionIndex = 0;
+  var normalIndex = 0;
+  var tangentIndex = 0;
+  var bitangentIndex = 0;
+  var stIndex = 0;
+  var index = 0;
   // 上下顶 + 外面 + 内面
-  let vertexCount = (phiSegments + 1) * (thetaSegments + 1) * 2 + (thetaSegments + 1) * 4;
+  var vertexCount =
+    (phiSegments + 1) * (thetaSegments + 1) * 2 + (thetaSegments + 1) * 4;
   // 上下面 + 内外面
-  let numIndices = phiSegments * thetaSegments * 2 * 2 * 3 + thetaSegments * 2 * 2 * 3;
-  if(thetaLength !== CesiumMath.TWO_PI) {
+  var numIndices =
+    phiSegments * thetaSegments * 2 * 2 * 3 + thetaSegments * 2 * 2 * 3;
+  if (thetaLength !== CesiumMath.TWO_PI) {
     //2个截面
-    numIndices+=+ 4 * 3;
+    numIndices += +4 * 3;
   }
-  let indices  = IndexDatatype.createTypedArray(vertexCount, numIndices);
+  var indices = IndexDatatype.createTypedArray(vertexCount, numIndices);
 
-  let positions = new Float64Array(vertexCount * 3);
+  var positions = new Float64Array(vertexCount * 3);
 
-  let normals = vertexFormat.normal
-                ? new Float32Array(vertexCount * 3)
-                : undefined;
+  var normals = vertexFormat.normal
+    ? new Float32Array(vertexCount * 3)
+    : undefined;
 
-  let tangents = vertexFormat.tangent
-                 ? new Float32Array(vertexCount * 3)
-                 : undefined;
+  var tangents = vertexFormat.tangent
+    ? new Float32Array(vertexCount * 3)
+    : undefined;
 
-  let bitangents = vertexFormat.bitangent
-                   ? new Float32Array(vertexCount * 3)
-                   : undefined;
+  var bitangents = vertexFormat.bitangent
+    ? new Float32Array(vertexCount * 3)
+    : undefined;
 
-  let st = vertexFormat.st ? new Float32Array(vertexCount * 2) : undefined;
+  var st = vertexFormat.st ? new Float32Array(vertexCount * 2) : undefined;
   // 顶面
 
   // some helper variables
-  let radius = topInnerRadius;
-  let radiusStep = ((topOuterRadius - topInnerRadius) / phiSegments);
+  var radius = topInnerRadius;
+  var radiusStep = (topOuterRadius - topInnerRadius) / phiSegments;
   // generate vertices, normals and uvs
   for (let j = 0; j <= phiSegments; j++) {
-
     for (let i = 0; i <= thetaSegments; i++) {
-
       // values are generate from the inside of the ring to the outside
-     let segment = thetaStart + i / thetaSegments * thetaLength;
+      var segment = thetaStart + (i / thetaSegments) * thetaLength;
 
       // vertex
-      let x = radius * Math.cos(segment);
-      let y = radius * Math.sin(segment);
+      var x = radius * Math.cos(segment);
+      var y = radius * Math.sin(segment);
 
       positions[positionIndex++] = x;
       positions[positionIndex++] = y;
       positions[positionIndex++] = 0;
 
-      if (vertexFormat.normal || vertexFormat.tangent || vertexFormat.bitangent) {
+      if (
+        vertexFormat.normal ||
+        vertexFormat.tangent ||
+        vertexFormat.bitangent
+      ) {
         // normal
         if (vertexFormat.normal) {
           normals[normalIndex++] = 0;
@@ -345,22 +347,19 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
 
     // increase the radius for next row of vertices
     radius += radiusStep;
-
   }
 
-  let topStart = 0;
+  var topStart = 0;
   for (let j = 0; j < phiSegments; j++) {
-
-    let thetaSegmentLevel = j * (thetaSegments + 1);
+    var thetaSegmentLevel = j * (thetaSegments + 1);
 
     for (let i = 0; i < thetaSegments; i++) {
+      var segment = i + thetaSegmentLevel;
 
-      let segment = i + thetaSegmentLevel;
-
-      let a = topStart + segment;
-      let b = topStart + segment + thetaSegments + 1;
-      let c = topStart + segment + thetaSegments + 2;
-      let d = topStart + segment + 1;
+      var a = topStart + segment;
+      var b = topStart + segment + thetaSegments + 1;
+      var c = topStart + segment + thetaSegments + 2;
+      var d = topStart + segment + 1;
 
       // faces
       indices[index++] = a;
@@ -373,22 +372,24 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
   }
   // 底面
   radius = bottomOuterRadius;
-  radiusStep = ((bottomInnerRadius - bottomOuterRadius) / phiSegments);
+  radiusStep = (bottomInnerRadius - bottomOuterRadius) / phiSegments;
   for (let j = 0; j <= phiSegments; j++) {
-
     for (let i = 0; i <= thetaSegments; i++) {
-
       // values are generate from the inside of the ring to the outside
-      let segment = thetaStart + i / thetaSegments * thetaLength;
+      var segment = thetaStart + (i / thetaSegments) * thetaLength;
 
       // vertex
-      let x = radius * Math.cos(segment);
-      let y = radius * Math.sin(segment);
+      var x = radius * Math.cos(segment);
+      var y = radius * Math.sin(segment);
       positions[positionIndex++] = x;
       positions[positionIndex++] = y;
       positions[positionIndex++] = -length;
 
-      if (vertexFormat.normal || vertexFormat.tangent || vertexFormat.bitangent) {
+      if (
+        vertexFormat.normal ||
+        vertexFormat.tangent ||
+        vertexFormat.bitangent
+      ) {
         // normal
         if (vertexFormat.normal) {
           normals[normalIndex++] = 0;
@@ -420,21 +421,18 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
 
     // increase the radius for next row of vertices
     radius += radiusStep;
-
   }
-  let bottomStart = (phiSegments + 1) * (thetaSegments + 1);
+  var bottomStart = (phiSegments + 1) * (thetaSegments + 1);
   for (let j = 0; j < phiSegments; j++) {
-
-    let thetaSegmentLevel = j * (thetaSegments + 1);
+    var thetaSegmentLevel = j * (thetaSegments + 1);
 
     for (let i = 0; i < thetaSegments; i++) {
+      var segment = i + thetaSegmentLevel;
 
-      let segment = i + thetaSegmentLevel;
-
-      let a = bottomStart + segment;
-      let b = bottomStart + segment + thetaSegments + 1;
-      let c = bottomStart + segment + thetaSegments + 2;
-      let d = bottomStart + segment + 1;
+      var a = bottomStart + segment;
+      var b = bottomStart + segment + thetaSegments + 1;
+      var c = bottomStart + segment + thetaSegments + 2;
+      var d = bottomStart + segment + 1;
 
       // faces
       indices[index++] = a;
@@ -447,10 +445,10 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
   }
 
   // 内面
-  for(let i = thetaSegments; i >=0; i--) {
-    let segment = thetaStart + i / thetaSegments * thetaLength;
-    let cos = Math.cos(segment);
-    let sin = Math.sin(segment);
+  for (let i = thetaSegments; i >= 0; i--) {
+    var segment = thetaStart + (i / thetaSegments) * thetaLength;
+    var cos = Math.cos(segment);
+    var sin = Math.sin(segment);
     positions[positionIndex++] = topInnerRadius * cos;
     positions[positionIndex++] = topInnerRadius * sin;
     positions[positionIndex++] = 0;
@@ -458,12 +456,15 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
     positions[positionIndex++] = bottomInnerRadius * sin;
     positions[positionIndex++] = -length;
 
-    let theta = Math.atan2(Math.abs(topInnerRadius - bottomInnerRadius), length);
-    let normalScale = Math.cos(theta);
+    var theta = Math.atan2(
+      Math.abs(topInnerRadius - bottomInnerRadius),
+      length
+    );
+    var normalScale = Math.cos(theta);
 
-    let normal = new Cartesian3();
-    let tangent = new Cartesian3();
-    let bitangent = new Cartesian3();
+    var normal = new Cartesian3();
+    var tangent = new Cartesian3();
+    var bitangent = new Cartesian3();
     normal.z = Math.sin(theta);
     normal.x = normalScale * cos;
     normal.y = normalScale * sin;
@@ -479,7 +480,10 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
         normals[normalIndex++] = normal.z;
       }
 
-      tangent = Cartesian3.normalize(Cartesian3.cross(Cartesian3.UNIT_Z, normal,tangent),tangent);
+      tangent = Cartesian3.normalize(
+        Cartesian3.cross(Cartesian3.UNIT_Z, normal, tangent),
+        tangent
+      );
       // tangent
       if (vertexFormat.tangent) {
         tangents[tangentIndex++] = tangent.x;
@@ -510,7 +514,7 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
 
     // uv
     if (vertexFormat.st) {
-      let rad = Math.max(topInnerRadius, bottomInnerRadius);
+      var rad = Math.max(topInnerRadius, bottomInnerRadius);
       st[stIndex++] = (x + rad) / (2.0 * rad);
       st[stIndex++] = (y + rad) / (2.0 * rad);
 
@@ -519,12 +523,12 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
     }
   }
 
-  let innserStart = (phiSegments + 1) * (thetaSegments + 1) * 2;
+  var innserStart = (phiSegments + 1) * (thetaSegments + 1) * 2;
   for (let i = 0; i < thetaSegments; i++) {
-    let a = innserStart + i * 2;
-    let b = innserStart + i * 2 + 1
-    let c = innserStart + i * 2 + 3;
-    let d = innserStart + i * 2 + 2;
+    var a = innserStart + i * 2;
+    var b = innserStart + i * 2 + 1;
+    var c = innserStart + i * 2 + 3;
+    var d = innserStart + i * 2 + 2;
     // faces
     indices[index++] = a;
     indices[index++] = b;
@@ -536,10 +540,10 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
 
   // 外面
 
-  for(let i = 0; i<thetaSegments + 1; i++) {
-    let segment = thetaStart + i / thetaSegments * thetaLength;
-    let cos = Math.cos(segment);
-    let sin = Math.sin(segment);
+  for (let i = 0; i < thetaSegments + 1; i++) {
+    var segment = thetaStart + (i / thetaSegments) * thetaLength;
+    var cos = Math.cos(segment);
+    var sin = Math.sin(segment);
     positions[positionIndex++] = topOuterRadius * cos;
     positions[positionIndex++] = topOuterRadius * sin;
     positions[positionIndex++] = 0;
@@ -548,12 +552,15 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
     positions[positionIndex++] = bottomOuterRadius * sin;
     positions[positionIndex++] = -length;
 
-    let theta = Math.atan2(Math.abs(bottomOuterRadius - topOuterRadius), length);
-    let normalScale = Math.cos(theta);
+    var theta = Math.atan2(
+      Math.abs(bottomOuterRadius - topOuterRadius),
+      length
+    );
+    var normalScale = Math.cos(theta);
 
-    let normal = new Cartesian3();
-    let tangent = new Cartesian3();
-    let bitangent = new Cartesian3();
+    var normal = new Cartesian3();
+    var tangent = new Cartesian3();
+    var bitangent = new Cartesian3();
     normal.z = Math.sin(theta);
     normal.x = normalScale * Math.cos(segment);
     normal.y = normalScale * Math.sin(segment);
@@ -569,7 +576,10 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
         normals[normalIndex++] = normal.z;
       }
 
-      tangent = Cartesian3.normalize(Cartesian3.cross(Cartesian3.UNIT_Z, normal,tangent),tangent);
+      tangent = Cartesian3.normalize(
+        Cartesian3.cross(Cartesian3.UNIT_Z, normal, tangent),
+        tangent
+      );
       // tangent
       if (vertexFormat.tangent) {
         tangents[tangentIndex++] = tangent.x;
@@ -600,7 +610,7 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
 
     // uv
     if (vertexFormat.st) {
-      let rad = Math.max(topOuterRadius, bottomOuterRadius);
+      var rad = Math.max(topOuterRadius, bottomOuterRadius);
       st[stIndex++] = (x + rad) / (2.0 * rad);
       st[stIndex++] = (y + rad) / (2.0 * rad);
 
@@ -609,12 +619,13 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
     }
   }
 
-  let outerStart = (phiSegments + 1) * (thetaSegments + 1) * 2 + (thetaSegments + 1) * 2;
+  var outerStart =
+    (phiSegments + 1) * (thetaSegments + 1) * 2 + (thetaSegments + 1) * 2;
   for (let i = 0; i < thetaSegments; i++) {
-    let a = outerStart + i * 2;
-    let b = outerStart + i * 2 + 1;
-    let c = outerStart + i * 2 + 3;
-    let d = outerStart + i * 2 + 2;
+    var a = outerStart + i * 2;
+    var b = outerStart + i * 2 + 1;
+    var c = outerStart + i * 2 + 3;
+    var d = outerStart + i * 2 + 2;
     // faces
     indices[index++] = a;
     indices[index++] = b;
@@ -625,16 +636,16 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
   }
 
   // 两个截面
-  let ist = outerStart -2;
-  let isd = outerStart - 1;
-  let iet = innserStart;
-  let ied = innserStart + 1;
-  let ost = outerStart;
-  let osd = outerStart + 1;
-  let oet = vertexCount -2;
-  let oed = vertexCount -1;
+  var ist = outerStart - 2;
+  var isd = outerStart - 1;
+  var iet = innserStart;
+  var ied = innserStart + 1;
+  var ost = outerStart;
+  var osd = outerStart + 1;
+  var oet = vertexCount - 2;
+  var oed = vertexCount - 1;
 
-  if(thetaLength !== CesiumMath.TWO_PI) {
+  if (thetaLength !== CesiumMath.TWO_PI) {
     indices[index++] = ost;
     indices[index++] = isd;
     indices[index++] = osd;
@@ -652,7 +663,7 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
     indices[index++] = oed;
   }
 
-  let attributes = new GeometryAttributes();
+  var attributes = new GeometryAttributes();
   if (vertexFormat.position) {
     attributes.position = new GeometryAttribute({
       componentDatatype: ComponentDatatype.DOUBLE,
@@ -693,22 +704,22 @@ ConicSensorGeometry.createGeometry = function (conicSensorGeometry) {
     });
   }
 
-  let radiusScratch = new Cartesian2();
+  var radiusScratch = new Cartesian2();
   radiusScratch.x = length;
-  radiusScratch.y = Math.max(topOuterRadius,bottomOuterRadius);
+  radiusScratch.y = Math.max(topOuterRadius, bottomOuterRadius);
 
-  let boundingSphere = new BoundingSphere(
+  var boundingSphere = new BoundingSphere(
     new Cartesian3(0, 0, 0),
     Cartesian2.magnitude(radiusScratch)
   );
 
   if (defined(conicSensorGeometry._offsetAttribute)) {
     length = positions.length;
-    let applyOffset = new Uint8Array(length / 3);
-    let offsetValue =
+    var applyOffset = new Uint8Array(length / 3);
+    var offsetValue =
       conicSensorGeometry._offsetAttribute === GeometryOffsetAttribute.NONE
-      ? 0
-      : 1;
+        ? 0
+        : 1;
     arrayFill(applyOffset, offsetValue);
     attributes.applyOffset = new GeometryAttribute({
       componentDatatype: ComponentDatatype.UNSIGNED_BYTE,

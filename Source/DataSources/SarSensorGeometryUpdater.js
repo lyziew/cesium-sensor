@@ -35,8 +35,8 @@ function SarSensorGeometryOptions(entity) {
   this.maxLeftAngle = undefined;
   this.minRightAngle = undefined;
   this.maxRightAngle = undefined;
-  this.leftRange = undefined;
-  this.rightRange = undefined;
+  this.leftWidth = undefined;
+  this.rightWidth = undefined;
   this.offsetAttribute = undefined;
 }
 
@@ -63,7 +63,12 @@ function SarSensorGeometryUpdater(entity, scene) {
     ],
   });
 
-  this._onEntityPropertyChanged(entity, "sarSensor", entity.sarSensor, undefined);
+  this._onEntityPropertyChanged(
+    entity,
+    "sarSensor",
+    entity.sarSensor,
+    undefined
+  );
 }
 
 if (defined(Object.create)) {
@@ -94,7 +99,9 @@ Object.defineProperties(SarSensorGeometryUpdater.prototype, {
  *
  * @exception {DeveloperError} This instance does not represent a filled geometry.
  */
-SarSensorGeometryUpdater.prototype.createFillGeometryInstance = function (time) {
+SarSensorGeometryUpdater.prototype.createFillGeometryInstance = function (
+  time
+) {
   //>>includeStart('debug', pragmas.debug);
   Check.defined("time", time);
 
@@ -110,9 +117,9 @@ SarSensorGeometryUpdater.prototype.createFillGeometryInstance = function (time) 
 
   var show = new ShowGeometryInstanceAttribute(
     isAvailable &&
-    entity.isShowing &&
-    this._showProperty.getValue(time) &&
-    this._fillProperty.getValue(time)
+      entity.isShowing &&
+      this._showProperty.getValue(time) &&
+      this._fillProperty.getValue(time)
   );
   var distanceDisplayCondition = this._distanceDisplayConditionProperty.getValue(
     time
@@ -201,9 +208,9 @@ SarSensorGeometryUpdater.prototype.createOutlineGeometryInstance = function (
   var attributes = {
     show: new ShowGeometryInstanceAttribute(
       isAvailable &&
-      entity.isShowing &&
-      this._showProperty.getValue(time) &&
-      this._showOutlineProperty.getValue(time)
+        entity.isShowing &&
+        this._showProperty.getValue(time) &&
+        this._showOutlineProperty.getValue(time)
     ),
     color: ColorGeometryInstanceAttribute.fromColor(outlineColor),
     distanceDisplayCondition: DistanceDisplayConditionGeometryInstanceAttribute.fromDistanceDisplayCondition(
@@ -256,8 +263,8 @@ SarSensorGeometryUpdater.prototype._isDynamic = function (entity, sarSensor) {
     !Property.isConstant(sarSensor.maxLeftAngle) || //
     !Property.isConstant(sarSensor.minRightAngle) || //
     !Property.isConstant(sarSensor.maxRightAngle) || //
-    !Property.isConstant(sarSensor.leftRange) || //
-    !Property.isConstant(sarSensor.rightRange)
+    !Property.isConstant(sarSensor.leftWidth) || //
+    !Property.isConstant(sarSensor.rightWidth)
   );
 };
 
@@ -273,34 +280,37 @@ SarSensorGeometryUpdater.prototype._setStaticOptions = function (
   var options = this._options;
   options.vertexFormat =
     this._materialProperty instanceof ColorMaterialProperty
-    ? PerInstanceColorAppearance.VERTEX_FORMAT
-    : MaterialAppearance.MaterialSupport.TEXTURED.vertexFormat;
+      ? PerInstanceColorAppearance.VERTEX_FORMAT
+      : MaterialAppearance.MaterialSupport.TEXTURED.vertexFormat;
   options.length = sarSensor.length.getValue(Iso8601.MINIMUM_VALUE);
   options.minLeftAngle = Property.getValueOrUndefined(
     sarSensor.minLeftAngle,
-    Iso8601.MINIMUM_VALUE);
+    Iso8601.MINIMUM_VALUE
+  );
   options.maxLeftAngle = Property.getValueOrUndefined(
     sarSensor.maxLeftAngle,
-    Iso8601.MINIMUM_VALUE);
+    Iso8601.MINIMUM_VALUE
+  );
   options.minRightAngle = Property.getValueOrUndefined(
     sarSensor.minRightAngle,
-    Iso8601.MINIMUM_VALUE);
+    Iso8601.MINIMUM_VALUE
+  );
   options.maxRightAngle = Property.getValueOrUndefined(
     sarSensor.maxRightAngle,
     Iso8601.MINIMUM_VALUE
   );
-  options.leftRange = Property.getValueOrUndefined(
-    sarSensor.leftRange,
+  options.leftWidth = Property.getValueOrUndefined(
+    sarSensor.leftWidth,
     Iso8601.MINIMUM_VALUE
   );
-  options.rightRange = Property.getValueOrUndefined(
-    sarSensor.rightRange,
+  options.rightWidth = Property.getValueOrUndefined(
+    sarSensor.rightWidth,
     Iso8601.MINIMUM_VALUE
   );
   options.offsetAttribute =
     heightReference !== HeightReference.NONE
-    ? GeometryOffsetAttribute.ALL
-    : undefined;
+      ? GeometryOffsetAttribute.ALL
+      : undefined;
 };
 
 SarSensorGeometryUpdater.prototype._onEntityPropertyChanged = heightReferenceOnEntityPropertyChanged;
@@ -365,15 +375,27 @@ DynamicSarSensorGeometryUpdater.prototype._setOptions = function (
   );
   var options = this._options;
   options.length = Property.getValueOrUndefined(sarSensor.length, time);
-  options.minLeftAngle = Property.getValueOrUndefined(sarSensor.minLeftAngle, time);
-  options.maxLeftAngle = Property.getValueOrUndefined(sarSensor.maxLeftAngle, time);
-  options.minRightAngle = Property.getValueOrUndefined(sarSensor.minRightAngle, time);
-  options.maxRightAngle = Property.getValueOrUndefined(sarSensor.maxRightAngle, time);
-  options.leftRange = Property.getValueOrUndefined(sarSensor.leftRange, time);
-  options.rightRange = Property.getValueOrUndefined(sarSensor.rightRange, time);
+  options.minLeftAngle = Property.getValueOrUndefined(
+    sarSensor.minLeftAngle,
+    time
+  );
+  options.maxLeftAngle = Property.getValueOrUndefined(
+    sarSensor.maxLeftAngle,
+    time
+  );
+  options.minRightAngle = Property.getValueOrUndefined(
+    sarSensor.minRightAngle,
+    time
+  );
+  options.maxRightAngle = Property.getValueOrUndefined(
+    sarSensor.maxRightAngle,
+    time
+  );
+  options.leftWidth = Property.getValueOrUndefined(sarSensor.leftWidth, time);
+  options.rightWidth = Property.getValueOrUndefined(sarSensor.rightWidth, time);
   options.offsetAttribute =
     heightReference !== HeightReference.NONE
-    ? GeometryOffsetAttribute.ALL
-    : undefined;
+      ? GeometryOffsetAttribute.ALL
+      : undefined;
 };
 export default SarSensorGeometryUpdater;
